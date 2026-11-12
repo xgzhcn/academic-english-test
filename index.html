@@ -71,24 +71,21 @@
         <!-- ================= 教师端视图 ================= -->
         <section id="teacher-section" class="hidden space-y-6">
             
-            <div id="teacher-login-section" class="bg-white rounded-lg shadow p-8 max-w-md mx-auto mt-12 border border-gray-200">
+           <div id="teacher-login-section" class="bg-white rounded-lg shadow p-8 max-w-md mx-auto mt-12 border border-gray-200">
                 <div class="text-center mb-6">
                     <h2 class="text-2xl font-bold text-gray-900">教师端登录</h2>
-                    <p class="text-sm text-gray-500 mt-2">请输入管理员验证码。</p>
+                    <p class="text-sm text-gray-500 mt-2">请输入您的专属安全码以查看学情数据。</p>
                 </div>
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">管理员邮箱</label>
-                        <input type="email" value="xgzhcn@gmail.com" class="w-full border border-gray-300 rounded-md py-2 px-3 bg-gray-50" readonly>
+                        <input type="email" value="xgzhcn@gmail.com" class="w-full border border-gray-300 rounded-md py-2 px-3 bg-gray-50 text-gray-500" readonly>
                     </div>
-                    <div id="verification-block" class="hidden">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">验证码 (测试码: 888888)</label>
-                        <input type="text" id="teacher-code" placeholder="输入 6 位验证码" class="w-full border border-gray-300 rounded-md py-2 px-3 text-center tracking-widest text-lg font-mono">
+                    <div id="verification-block">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">专属安全码 (Security Code)</label>
+                        <input type="password" id="teacher-code" placeholder="输入 6 位安全码" class="w-full border border-gray-300 rounded-md py-2 px-3 text-center tracking-widest text-lg font-mono focus:ring-blue-500 focus:border-blue-500">
                     </div>
-                    <button id="send-code-btn" class="w-full bg-gray-100 text-gray-800 border border-gray-300 font-medium py-2 px-4 rounded-md hover:bg-gray-200">
-                        发送验证码
-                    </button>
-                    <button id="verify-login-btn" class="hidden w-full bg-blue-600 text-white font-medium py-2 px-4 rounded-md hover:bg-blue-700">
+                    <button id="verify-login-btn" class="w-full bg-blue-600 text-white font-medium py-2 px-4 rounded-md hover:bg-blue-700 transition-colors mt-4">
                         验证并登录
                     </button>
                 </div>
