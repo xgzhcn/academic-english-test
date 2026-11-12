@@ -48,21 +48,40 @@
                         <input type="text" id="student-id" class="w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="例如：2026001">
                     </div>
                 </div>
-                <button id="start-test-btn" class="mt-6 w-full bg-blue-600 text-white font-medium py-2 px-4 rounded-md hover:bg-blue-700 transition-colors">
+
+                <div class="mt-6 border-t border-gray-200 pt-4">
+                    <label class="block text-sm font-medium text-gray-900 mb-3">选择试卷 (Select Paper Version)</label>
+                    <div class="flex flex-col sm:flex-row sm:space-x-8 space-y-3 sm:space-y-0">
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="radio" name="paper-select" value="A" class="form-radio text-blue-600 focus:ring-blue-500 h-5 w-5" checked>
+                            <span class="ml-2 text-gray-800 font-medium">A卷 (Paper A - 35题)</span>
+                        </label>
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="radio" name="paper-select" value="B" class="form-radio text-blue-600 focus:ring-blue-500 h-5 w-5">
+                            <span class="ml-2 text-gray-800 font-medium">B卷 (Paper B - 35题)</span>
+                        </label>
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="radio" name="paper-select" value="ALL" class="form-radio text-blue-600 focus:ring-blue-500 h-5 w-5">
+                            <span class="ml-2 text-gray-800 font-medium">A+B全卷 (Both - 70题)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <button id="start-test-btn" class="mt-8 w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-md hover:bg-blue-700 transition-colors text-lg shadow-sm">
                     开始测试 (Start Test)
                 </button>
             </div>
 
             <div id="test-container" class="hidden space-y-6"></div>
 
-            <button id="submit-test-btn" class="hidden w-full bg-green-600 text-white font-bold py-3 px-4 rounded-md hover:bg-green-700 transition-colors text-lg">
+            <button id="submit-test-btn" class="hidden w-full bg-green-600 text-white font-bold py-3 px-4 rounded-md hover:bg-green-700 transition-colors text-lg shadow-sm">
                 提交试卷 (Submit Test)
             </button>
 
             <div id="result-container" class="hidden bg-white rounded-lg shadow p-8 text-center">
                 <h2 class="text-3xl font-bold text-gray-900 mb-2">测试完成！</h2>
                 <div class="inline-block bg-blue-50 rounded-full px-8 py-4 mb-6 border border-blue-100 mt-4">
-                    <p id="score-display" class="text-xl text-gray-700">你的最终得分：<span class="text-blue-600 font-bold text-5xl">0</span> / 40</p>
+                    <p id="score-display" class="text-xl text-gray-700">你的最终得分：<span class="text-blue-600 font-bold text-5xl">0</span> / 0</p>
                 </div>
                 <p class="text-gray-600">请向下滚动查看错题及详细解析。</p>
             </div>
@@ -95,9 +114,9 @@
                 <div class="flex flex-wrap gap-3 justify-between items-center bg-white p-4 rounded-lg shadow">
                     <h2 class="text-xl font-bold text-gray-800">学情分析概览</h2>
                     <div class="flex space-x-2">
-                        <button id="export-csv-btn" class="text-sm bg-green-50 hover:bg-green-100 text-green-700 py-1.5 px-3 rounded border border-green-200 font-medium">导出 Excel (CSV)</button>
-                        <button id="refresh-data-btn" class="text-sm bg-blue-50 hover:bg-blue-100 text-blue-700 py-1.5 px-3 rounded border border-blue-200 font-medium">刷新数据</button>
-                        <button id="clear-records-btn" class="text-sm bg-red-50 hover:bg-red-100 text-red-700 py-1.5 px-3 rounded border border-red-200 font-medium">清空记录</button>
+                        <button id="export-csv-btn" class="text-sm bg-green-50 hover:bg-green-100 text-green-700 py-1.5 px-3 rounded border border-green-200 font-medium shadow-sm">导出 Excel (CSV)</button>
+                        <button id="refresh-data-btn" class="text-sm bg-blue-50 hover:bg-blue-100 text-blue-700 py-1.5 px-3 rounded border border-blue-200 font-medium shadow-sm">刷新数据</button>
+                        <button id="clear-records-btn" class="text-sm bg-red-50 hover:bg-red-100 text-red-700 py-1.5 px-3 rounded border border-red-200 font-medium shadow-sm">清空记录</button>
                     </div>
                 </div>
                 
@@ -107,13 +126,14 @@
                             <tr>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">姓名</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">学号</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">试卷</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">得分</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">提交时间</th>
                                 <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">操作</th>
                             </tr>
                         </thead>
                         <tbody id="student-data-body" class="bg-white divide-y divide-gray-200">
-                            <tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">加载中...</td></tr>
+                            <tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">加载中...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -140,84 +160,13 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // ================= 完整40题题库 =================
-        const questionsData = [];
-        
-        const rawSentences = [
-            { t: "Comma Splice", o: "Côté and Morgan have shown that emotion regulation influences job satisfaction, and that amplifying positive emotions increases positive interactions." },
-            { t: "Punctuation", o: "The business decisions managers take can have significant implications; however, most managers do not have training in business ethics." },
-            { t: "Relative Clause", o: "The World Wide Web is a constantly developing technology that has many advantages for society." },
-            { t: "Semicolon", o: "Lupton (1998) claims that the public is interested in health news; however, I argue that media coverage does not indicate genuine public interest." },
-            { t: "Transition", o: "Wolf (2008) argues that business should not concern itself with social consequences; on the other hand, Svensson and Wood claim that business and society are co-dependent." },
-            { t: "Apostrophe", o: "Some theologists think that therapeutic cloning is acceptable." },
-            { t: "Possessive", o: "Greenpeace states that one of its aims is to expose threats to the environment." },
-            { t: "Possessive Noun", o: "A country's government usually resides in the capital city." },
-            { t: "Possessive", o: "An employee's career is influenced by many different factors." },
-            { t: "Plural Possessive", o: "We analysed the students' questionnaires using this university's own software programme." },
-            { t: "Unnecessary Comma", o: "It has been shown in this essay that this is not the case." },
-            { t: "Complement Clause", o: "It is illogical that people think pollution is not important." },
-            { t: "That Clause", o: "The fact is that we cannot determine the outcome." },
-            { t: "Colon usage", o: "This essay will discuss the most important aspect of genetic research: cloning." },
-            { t: "Reporting Verb", o: "Lenin (1914) claimed that a nation could not be truly free while it oppressed other nations." },
-            { t: "Parallelism", o: "Collins (1994) suggests that if businesses do not operate with a degree of trust and co-operation, they will put constraints on profitability." },
-            { t: "Parallelism", o: "What the 2017 World Happiness Report suggests is that people need to feel that they have social support, are able to make choices, and can trust national institutions." },
-            { t: "Faulty Comparison", o: "Our survey revealed that students generally find reading journal articles more difficult than listening to lectures." },
-            { t: "List Balance", o: "Skrzypiec (2017) uses the ITT model to test how important drug use, fighting, and theft are as factors in adolescents’ intention to transgress." },
-            { t: "List Balance", o: "Having good neighbours, socialising, and accessing available help are all key factors in community support for the elderly." },
-            { t: "Subject Verb", o: "Smith et al. (2000) report that this level of violence is harmful." },
-            { t: "Uncountable Noun", o: "Recent research also shows that the drugs are effective." },
-            { t: "Subject Verb", o: "Malicious software such as worms has been increasingly used." },
-            { t: "Plural Subject", o: "The two types differ in the way they can be treated." },
-            { t: "Collective Noun", o: "A research company has recently produced a new report." },
-            { t: "Tense Consistency", o: "Wolf (2008) shares this view and Prindle (2009) also suggests that..." },
-            { t: "Tense Consistency", o: "The solution was put into the test tube and heated to 90 degrees." },
-            { t: "Conditional", o: "If this theory is correct, it will mean that all previous data must be reviewed." },
-            { t: "Tense Match", o: "Ariti et al. (2018) argue that farmer participation increases ownership, and they also suggest that it helps social cohesion." },
-            { t: "Academic Verb", o: "Geizen (2012) states that it is important to keep a megaproject as simple as possible." },
-            { t: "Verb Pattern", o: "The model is capable of making accurate predictions." },
-            { t: "Infinitive", o: "The increase in greenhouse gases causes the temperature to rise." },
-            { t: "Transitive Verb", o: "We discussed increasing the number of employees." },
-            { t: "Infinitive", o: "The failure of cells to remove sugars causes diabetes." },
-            { t: "Preposition", o: "Lewes (2000) rejects the idea of using DNA as evidence of guilt." },
-            { t: "Pronoun Clarity", o: "According to Giezen’s model, the probability of budget overrun in a megaproject can often be reduced by keeping the project as simple as possible." },
-            { t: "Ambiguity", o: "Players and team coaches were classified according to sport and the number of games the players currently played each season." },
-            { t: "Subjective Tone", o: "The city’s transport policy will lead to an increase in traffic; this is the primary issue to consider at this meeting." },
-            { t: "Vague Pronoun", o: "If these personal road accident stories are shared, the number of accidents will hopefully be reduced." },
-            { t: "Informal Tone", o: "The 2018 report is a key document demonstrating the importance of job satisfaction, and it warrants careful consideration." }
-        ];
-
-        // 生成干扰项（已移除泄漏答案的提示）
-        rawSentences.forEach((item, i) => {
-            const correctOptIndex = i % 4;
-            const options = new Array(4);
-            
-            const distractors = [
-                item.o.replace(/, /g, " ").replace(/;/g, ","),
-                item.o.replace(/ is /g, " are ").replace(/ has /g, " have ").replace(/s /g, " "),
-                item.o.replace(/ of /g, " for ").replace(/ to /g, " on "),
-                item.o.replace(/ing /g, "ed ").replace(/ed /g, "ing ")
-            ];
-            
-            options[correctOptIndex] = item.o;
-            
-            let distCount = 0;
-            for(let j=0; j<4; j++) {
-                if(j !== correctOptIndex) {
-                    options[j] = distractors[distCount]; 
-                    distCount++;
-                }
-            }
-
-            questionsData.push({
-                text: item.t, 
-                options: options,
-                explanation: `Correct academic structure requires precise punctuation, matching subjects/verbs, and objective tone.`
-            });
-        });
+        // ================= 完整70题真实题库 =================
+        const questionsData = [{"id":1,"paper":"A","category":"Comma Splices & Run-on Sentences","text":"Côté and Morgan found that emotion regulation influences job satisfaction and that amplifying positive emotions improves workplace interactions. They found no evidence that job satisfaction affects emotion regulation. Which revision accurately and clearly summarises the direction of the relationship with job satisfaction?","options":["Emotion regulation influences job satisfaction. The researchers found no evidence for the reverse relationship.","Job satisfaction influences emotion regulation. The researchers found no evidence for the reverse relationship.","Emotion regulation influences job satisfaction, the researchers found no evidence for the reverse relationship.","Emotion regulation influences job satisfaction. The researchers found evidence that job satisfaction influences emotion regulation."],"correct":0,"explanation":"分句拆开后，前句陈述研究结果，后句说明缺乏反向关系的证据。仅用逗号连接两个独立分句会造成逗号拼接。"},{"id":2,"paper":"B","category":"Comma Splices & Run-on Sentences","text":"The decisions managers make can have significant implications___ most managers lack training in business ethics. Which insertion correctly joins the clauses?","options":[", however;","; however,",", however,","; however;"],"correct":1,"explanation":"however 是连接副词。前面可用分号分隔两个独立分句，后面用逗号。"},{"id":3,"paper":"A","category":"Comma Splices & Run-on Sentences","text":"The World Wide Web is a constantly developing technology ___. Choose the completion that forms one grammatical sentence.","options":["it offers many advantages to society",", it offers many advantages to society","that offers many advantages to society",", and offering many advantages to society"],"correct":2,"explanation":"that 引导限制性定语从句，修饰 technology。"},{"id":4,"paper":"B","category":"Comma Splices & Run-on Sentences","text":"Lupton claims that the public is interested in health news ___ I argue that media coverage does not indicate genuine public interest. Which punctuation properly links these contrasting clauses?","options":["; however, Lupton claims that the public is interested in health news, however, I argue that media coverage does not indicate genuine public interest.","; however; Lupton claims that the public is interested in health news; however; I argue that media coverage does not indicate genuine public interest.",", however, Lupton claims that the public is interested in health news, however, I argue that media coverage does not indicate genuine public interest.","; however, Lupton claims that the public is interested in health news; however, I argue that media coverage does not indicate genuine public interest."],"correct":3,"explanation":"连接副词 however 连接两个分句时，前面用分号，后面用逗号。"},{"id":5,"paper":"A","category":"Comma Splices & Run-on Sentences","text":"Wolf argues that business should not concern itself with social consequences ___ Svensson and Wood claim that business and society are co-dependent. Which insertion correctly links these opposing views?","options":["; on the other hand, Wolf argues that business should not concern itself with social consequences; on the other hand, Svensson and Wood claim that business and society are co-dependent.",", on the other hand, Wolf argues that business should not concern itself with social consequences, on the other hand, Svensson and Wood claim that business and society are co-dependent.","; on the other hand; Wolf argues that business should not concern itself with social consequences; on the other hand; Svensson and Wood claim that business and society are co-dependent.",", on the other hand; Wolf argues that business should not concern itself with social consequences, on the other hand; Svensson and Wood claim that business and society are co-dependent."],"correct":0,"explanation":"on the other hand 连接两个分句时，前面用分号，后面用逗号。"},{"id":6,"paper":"B","category":"Apostrophes (Possessives vs. Plurals)","text":"Some ___ think that therapeutic cloning is acceptable. Choose the correct form.","options":["theologists","theologist's","theologists'","theologists'"],"correct":0,"explanation":"这里表示复数概念，不需要所有格撇号。"},{"id":7,"paper":"A","category":"Apostrophes (Possessives vs. Plurals)","text":"Greenpeace states that one of ___ aims is to expose threats to the environment. Choose the correct form.","options":["its","it's","its'","it is"],"correct":0,"explanation":"its 是 it 的物主代词，it's 是 it is 的缩写。"},{"id":8,"paper":"B","category":"Apostrophes (Possessives vs. Plurals)","text":"A ___ government usually resides in the capital city. Choose the correct form.","options":["countrys","country's","countries'","countries"],"correct":1,"explanation":"单数名词的所属，加 's。"},{"id":9,"paper":"A","category":"Apostrophes (Possessives vs. Plurals)","text":"An ___ career is influenced by many different factors. Choose the correct form.","options":["employee's","employees'","employees","employee"],"correct":0,"explanation":"单数名词的所属，加 's。"},{"id":10,"paper":"B","category":"Apostrophes (Possessives vs. Plurals)","text":"We analysed the ___ questionnaires using this ___ own software programme. Choose the correct forms.","options":["student's / universities","students' / university's","students' / universities","students / universitys"],"correct":1,"explanation":"students' 是以 s 结尾的复数名词的所属，只加撇号。university's 是单数名词的所属，加 's。"},{"id":11,"paper":"A","category":"Unnecessary Commas with That","text":"It has been shown in this essay, that this is not the case. Which is the corrected version?","options":["It has been shown in this essay that this is not the case.","It has been shown, in this essay that this is not the case.","It has been shown in this essay, that this, is not the case.","It, has been shown in this essay, that this is not the case."],"correct":0,"explanation":"that 引导宾语从句时，前面不需要加逗号。"},{"id":12,"paper":"B","category":"Unnecessary Commas with That","text":"It is illogical, that people think pollution is not important. Which is the corrected version?","options":["It is illogical that people think pollution is not important.","It is illogical that people think, pollution is not important.","It is illogical that, people think pollution is not important.","It is, illogical that people think pollution is not important."],"correct":0,"explanation":"that 引导主语从句时，前面不需要加逗号。"},{"id":13,"paper":"A","category":"Unnecessary Commas with That","text":"The fact is, that we cannot determine the outcome. Which is the corrected version?","options":["The fact is that we cannot determine the outcome.","The fact is that, we cannot determine the outcome.","The fact, is that we cannot determine the outcome.","The fact is that we cannot, determine the outcome."],"correct":0,"explanation":"that 引导表语从句时，前面不需要加逗号。"},{"id":14,"paper":"B","category":"Unnecessary Commas with That","text":"We can conclude, that the problem is becoming more serious. Which is the corrected version?","options":["We can conclude that the problem is becoming more serious.","We can conclude that, the problem is becoming more serious.","We can conclude that the problem, is becoming more serious.","We can conclude, that the problem, is becoming more serious."],"correct":0,"explanation":"that 引导宾语从句时，前面不需要加逗号。"},{"id":15,"paper":"A","category":"Colon Introducing a Clarification","text":"This essay will discuss the most important aspect of genetic research, cloning. Which punctuation mark more effectively introduces the specific topic?","options":["research: cloning.","research; cloning.","research. cloning.","research - cloning."],"correct":0,"explanation":"冒号用于引出对前面内容的解释或说明。"},{"id":16,"paper":"B","category":"Indirect Questions (Word Order)","text":"Lenin claimed that a nation could not be truly free ___. Choose the correct word order.","options":["while it oppressed other nations.","while did it oppress other nations.","while oppressed it other nations.","while other nations it oppressed."],"correct":0,"explanation":"在宾语从句中，应使用陈述句语序 (主语 + 谓语)。"},{"id":17,"paper":"A","category":"Indirect Questions (Word Order)","text":"The ITT model tests how important drug use, fighting, and theft ___ in adolescents’ intention to transgress. Choose the correct completion.","options":["are as factors","are they as factors","do they act as factors","act as factors they do"],"correct":0,"explanation":"在宾语从句中，应使用陈述句语序。主语是 drug use, fighting, and theft，谓语动词 are 应放在主语之后。"},{"id":18,"paper":"B","category":"Indirect Questions (Word Order)","text":"The report asked whether ___ sufficient funding for the project. Choose the correct completion.","options":["was there","there was","had there been","there had"],"correct":1,"explanation":"在宾语从句中，应使用陈述句语序。there was 是陈述句语序，was there 是疑问句语序。"},{"id":19,"paper":"A","category":"Indirect Questions (Word Order)","text":"It is unclear why ___ to participate in the study. Choose the correct completion.","options":["did they refuse","they refused","refused they","they did refuse"],"correct":1,"explanation":"在主语从句中，应使用陈述句语序。"},{"id":20,"paper":"B","category":"Indirect Questions (Word Order)","text":"The study investigated how ___ the new policy. Choose the correct completion.","options":["did the employees react to","the employees reacted to","reacted the employees to","the employees react to did"],"correct":1,"explanation":"在宾语从句中，应使用陈述句语序。"},{"id":21,"paper":"A","category":"Parallel Structure","text":"Collins suggests that if businesses do not operate with a degree of trust and ___, they will put constraints on profitability. Choose the word that creates parallel structure.","options":["co-operate","co-operation","co-operating","co-operated"],"correct":1,"explanation":"and 连接的前后词性应一致。trust 是名词，所以后面也应使用名词 co-operation。"},{"id":22,"paper":"B","category":"Parallel Structure","text":"What the 2017 World Happiness Report suggests is that people need to feel that they have social support, are able to make choices, and ___ national institutions. Choose the completion that maintains parallel structure.","options":["can trust","trusting","to trust","trust"],"correct":0,"explanation":"and 连接的三个并列成分 (have..., are..., can trust...) 应保持结构一致。"},{"id":23,"paper":"A","category":"Parallel Structure","text":"Our survey revealed that students generally find reading journal articles more difficult than ___. Choose the completion that maintains parallel structure.","options":["to listen to lectures","listening to lectures","listen to lectures","listened to lectures"],"correct":1,"explanation":"than 连接的前后两部分结构应一致。前面是 reading journal articles，所以后面应使用 listening to lectures。"},{"id":24,"paper":"B","category":"Parallel Structure","text":"Having good neighbours, socialising, and ___ are all key factors in community support for the elderly. Choose the completion that maintains parallel structure.","options":["access available help","to access available help","accessing available help","accessed available help"],"correct":2,"explanation":"and 连接的三个并列成分 (Having..., socialising, and accessing...) 应保持形式一致。"},{"id":25,"paper":"A","category":"Parallel Structure","text":"The methodology involves collecting data, analysing the results, and ___ a report. Choose the completion that maintains parallel structure.","options":["write","writing","to write","written"],"correct":1,"explanation":"and 连接的三个动名词 (collecting, analysing, writing) 应保持形式一致。"},{"id":26,"paper":"B","category":"Subject–Verb Agreement","text":"Smith et al. (2000) ___ that this level of violence is harmful. Choose the correct verb form.","options":["reports","report","reporting","is reporting"],"correct":1,"explanation":"Smith et al. 意为 \"Smith 等人\"，是复数概念，谓语动词应使用复数形式。"},{"id":27,"paper":"A","category":"Subject–Verb Agreement","text":"Recent research also ___ that the drugs are effective. Choose the correct verb form.","options":["shows","show","showing","are showing"],"correct":0,"explanation":"research 是不可数名词，谓语动词应使用单数形式。"},{"id":28,"paper":"B","category":"Subject–Verb Agreement","text":"Malicious software such as worms ___ been increasingly used. Choose the correct verb form.","options":["have","has","having","is having"],"correct":1,"explanation":"主语是 software (不可数名词)，谓语动词应使用单数形式。such as worms 是插入语，不影响谓语动词的单复数。"},{"id":29,"paper":"A","category":"Subject–Verb Agreement","text":"The two types ___ in the way they can be treated. Choose the correct verb form.","options":["differs","differ","differing","is differing"],"correct":1,"explanation":"主语是 The two types (复数)，谓语动词应使用复数形式。"},{"id":30,"paper":"B","category":"Subject–Verb Agreement","text":"A research company ___ recently produced a new report. Choose the correct verb form.","options":["have","has","having","are having"],"correct":1,"explanation":"主语是 A research company (单数)，谓语动词应使用单数形式。"},{"id":31,"paper":"A","category":"Verb Tenses","text":"Wolf (2008) shares this view and Prindle (2009) also ___ that… Choose the correct tense.","options":["suggested","suggests","suggesting","had suggested"],"correct":1,"explanation":"在学术写作中，引用文献的观点通常使用一般现在时，以保持时态的一致性。"},{"id":32,"paper":"B","category":"Verb Tenses","text":"The solution ___ into the test tube and heated to 90 degrees. Choose the correct verb form.","options":["is put","was put","put","has been put"],"correct":1,"explanation":"描述过去的实验步骤应使用一般过去时。并且前后动词时态应一致 (was put and heated)。"},{"id":33,"paper":"A","category":"Verb Tenses","text":"If this theory ___ correct, it will mean that all previous data must be reviewed. Choose the correct tense.","options":["was","is","were","will be"],"correct":1,"explanation":"在真实条件句中，如果主句使用一般将来时，从句通常使用一般现在时。"},{"id":34,"paper":"B","category":"Verb Tenses","text":"Ariti et al. (2018) argue that farmer participation increases ownership, and they also ___ that it helps social cohesion. Choose the correct tense.","options":["suggested","suggests","suggest","suggesting"],"correct":2,"explanation":"and 连接的前后两个分句时态应一致。前面是 argue (一般现在时复数)，所以后面应使用 suggest。"},{"id":35,"paper":"A","category":"Verb Tenses","text":"Since its discovery in 1990, the compound ___ in various industrial applications. Choose the correct tense.","options":["is used","was used","has been used","had been used"],"correct":2,"explanation":"\"Since + 过去时间\" 通常与现在完成时连用。"},{"id":36,"paper":"B","category":"Verb Patterns (Infinitives vs. Gerunds)","text":"Geizen states that it is important ___ a megaproject as simple as possible. Choose the correct verb form.","options":["keeping","to keep","keep","kept"],"correct":1,"explanation":"\"it is + 形容词 + to do sth.\" 结构中，it 是形式主语，真正的主语是后面的不定式。"},{"id":37,"paper":"A","category":"Verb Patterns (Infinitives vs. Gerunds)","text":"The model is capable of ___ accurate predictions. Choose the correct verb form.","options":["make","to make","making","made"],"correct":2,"explanation":"介词 of 后面应接动名词 (ing形式)。"},{"id":38,"paper":"B","category":"Verb Patterns (Infinitives vs. Gerunds)","text":"The increase in greenhouse gases causes the temperature ___. Choose the correct verb form.","options":["rise","to rise","rising","risen"],"correct":1,"explanation":"cause sb./sth. to do sth. 意为“导致某人/某事做某事”。"},{"id":39,"paper":"A","category":"Verb Patterns (Infinitives vs. Gerunds)","text":"We discussed ___ the number of employees. Choose the correct verb form.","options":["increase","to increase","increasing","increased"],"correct":2,"explanation":"discuss 后面通常接动名词 (ing形式) 作宾语。"},{"id":40,"paper":"B","category":"Verb Patterns (Infinitives vs. Gerunds)","text":"The failure of cells ___ sugars causes diabetes. Choose the correct verb form.","options":["remove","to remove","removing","removed"],"correct":1,"explanation":"failure 后面通常接不定式 (to do sth.) 作后置定语。"},{"id":41,"paper":"A","category":"Prepositions","text":"Lewes rejects the idea ___ using DNA as evidence of guilt. Choose the correct preposition.","options":["to","of","for","about"],"correct":1,"explanation":"the idea of doing sth. 意为“做某事的想法/观点”。"},{"id":42,"paper":"B","category":"Prepositions","text":"According ___ Giezen’s model, the probability of budget overrun can often be reduced. Choose the correct preposition.","options":["with","to","by","for"],"correct":1,"explanation":"according to 是固定搭配，意为“根据”。"},{"id":43,"paper":"A","category":"Prepositions","text":"Players and team coaches were classified according to sport and the number of games the players currently played ___ each season. Choose the correct preposition.","options":["in","on","at","for"],"correct":0,"explanation":"表示“在每个赛季中”，使用介词 in。"},{"id":44,"paper":"B","category":"Prepositions","text":"The city’s transport policy will lead ___ an increase in traffic. Choose the correct preposition.","options":["to","for","in","at"],"correct":0,"explanation":"lead to 是固定搭配，意为“导致”。"},{"id":45,"paper":"A","category":"Prepositions","text":"The data is based ___ a survey of 500 respondents. Choose the correct preposition.","options":["in","on","at","from"],"correct":1,"explanation":"be based on 是固定搭配，意为“基于”。"},{"id":46,"paper":"B","category":"Academic Tone, Pronouns, and Clarity","text":"The city’s transport policy will lead to an increase in traffic; ___ is the primary issue to consider at this meeting. Which word provides the clearest reference?","options":["this","it","which","this increase"],"correct":3,"explanation":"在学术写作中，应避免单独使用 this/that 指代前面的整句话或某个概念，最好加上具体的名词以明确指代对象。"},{"id":47,"paper":"A","category":"Academic Tone, Pronouns, and Clarity","text":"If these personal road accident stories are shared, the number of accidents will hopefully be reduced. Which revision creates a more formal, academic tone?","options":["Sharing personal road accident stories might reduce the number of accidents.","We hope that sharing personal road accident stories will reduce the number of accidents.","It is hoped that sharing personal road accident stories will reduce the number of accidents.","The sharing of personal road accident stories is expected to reduce the number of accidents."],"correct":3,"explanation":"在学术写作中，应尽量避免使用第一人称 (we) 和口语化表达 (hopefully)。使用名词短语 (The sharing of...) 和被动语态 (is expected to) 能使语气更加正式客观。"},{"id":48,"paper":"B","category":"Academic Tone, Pronouns, and Clarity","text":"The 2018 report is a key document demonstrating the importance of job satisfaction, and ___ warrants careful consideration. Which pronoun correctly and clearly refers to the report?","options":["this","they","it","which"],"correct":2,"explanation":"此处 it 明确指代前面的单数名词 The 2018 report。由于有 and 连接，不能使用关系代词 which。"},{"id":49,"paper":"A","category":"Academic Tone, Pronouns, and Clarity","text":"Researchers found that ___ can significantly impact results. Which completion is most academically appropriate?","options":["really bad weather","adverse weather conditions","terrible weather","bad weather"],"correct":1,"explanation":"adverse weather conditions 是正式的学术用语，而 really bad, terrible 属于口语化或带有主观色彩的词汇。"},{"id":50,"paper":"B","category":"Academic Tone, Pronouns, and Clarity","text":"The experiment was a bit of a failure because the equipment was broken. Which revision is most academically appropriate?","options":["The experiment wasn't successful because the equipment was broken.","The experiment was somewhat unsuccessful due to equipment failure.","The experiment failed because the equipment was busted.","The experiment did not yield the expected results due to equipment malfunction."],"correct":3,"explanation":"did not yield the expected results 和 equipment malfunction 是更加正式准确的学术表达。"},{"id":51,"paper":"A","category":"Articles","text":"___ methodology involves collecting data, analysing the results, and writing a report. Choose the correct article if this refers to a specific methodology already mentioned.","options":["A","An","The","(No article)"],"correct":2,"explanation":"特指前面提到过的方法论，使用定冠词 The。"},{"id":52,"paper":"B","category":"Articles","text":"___ water is essential for human survival. Choose the correct article.","options":["A","An","The","(No article)"],"correct":3,"explanation":"表示泛指的不可数名词前，通常不加冠词。"},{"id":53,"paper":"A","category":"Articles","text":"He is currently conducting research at ___ University of Melbourne. Choose the correct article.","options":["a","an","the","(No article)"],"correct":2,"explanation":"\"University of + 地名\" 结构前通常加定冠词 The。"},{"id":54,"paper":"B","category":"Articles","text":"The study focuses on ___ impact of climate change on coastal regions. Choose the correct article.","options":["a","an","the","(No article)"],"correct":2,"explanation":"impact 后有 of 短语限定，表示特指，使用定冠词 The。"},{"id":55,"paper":"A","category":"Articles","text":"Participants were asked to complete ___ online questionnaire. Choose the correct article.","options":["a","an","the","(No article)"],"correct":1,"explanation":"questionnaire 是可数名词单数，表示泛指“一个”，且 online 以元音音素开头，使用不定冠词 an。"},{"id":56,"paper":"B","category":"Relative Clauses","text":"The patient, ___ medical history is well documented, responded positively to the treatment. Choose the correct relative pronoun.","options":["who","whom","whose","which"],"correct":2,"explanation":"关系代词在定语从句中作 history 的定语，表示“病人的病史”，使用 whose。"},{"id":57,"paper":"A","category":"Relative Clauses","text":"The laboratory in ___ the experiments were conducted was fully equipped. Choose the correct relative pronoun.","options":["where","which","that","what"],"correct":1,"explanation":"介词 in 后面只能跟关系代词 which 或 whom，指代地点 laboratory 使用 which。"},{"id":58,"paper":"B","category":"Relative Clauses","text":"The reason ___ he resigned remains unclear. Choose the correct relative pronoun/adverb.","options":["why","which","what","because"],"correct":0,"explanation":"先行词是 reason，且关系词在定语从句中作原因状语，使用关系副词 why。"},{"id":59,"paper":"A","category":"Relative Clauses","text":"The data ___ was collected from the survey is currently being analysed. Choose the correct relative pronoun.","options":["who","whom","which","what"],"correct":2,"explanation":"先行词是 The data (事物)，且关系代词在定语从句中作主语，使用 which (或 that)。"},{"id":60,"paper":"B","category":"Relative Clauses","text":"She interviewed several candidates, none of ___ had the required experience. Choose the correct relative pronoun.","options":["who","whom","which","whose"],"correct":1,"explanation":"先行词是 candidates (人)，且在介词 of 后面作宾语，只能使用 whom。"},{"id":61,"paper":"A","category":"Word Forms (Parts of Speech)","text":"The manager emphasised the ___ of completing the project on time. Choose the correct word form.","options":["important","importance","importantly","import"],"correct":1,"explanation":"the 后面应接名词 importance。"},{"id":62,"paper":"B","category":"Word Forms (Parts of Speech)","text":"The new software has ___ improved the efficiency of the team. Choose the correct word form.","options":["significant","significance","significantly","signify"],"correct":2,"explanation":"修饰动词 improved 应使用副词 significantly。"},{"id":63,"paper":"A","category":"Word Forms (Parts of Speech)","text":"The results of the study were highly ___. Choose the correct word form.","options":["inform","information","informative","informatively"],"correct":2,"explanation":"were 后面应接形容词作表语，informative 意为“提供有用信息的”。"},{"id":64,"paper":"B","category":"Word Forms (Parts of Speech)","text":"Her ___ to the team's success was widely acknowledged. Choose the correct word form.","options":["contribute","contribution","contributor","contributory"],"correct":1,"explanation":"Her 后面应接名词 contribution。"},{"id":65,"paper":"A","category":"Word Forms (Parts of Speech)","text":"The company plans to ___ its operations in the Asian market. Choose the correct word form.","options":["expansion","expansive","expand","expansively"],"correct":2,"explanation":"plan to 后面应接动词原形 expand。"},{"id":66,"paper":"B","category":"Relative Clauses & Modifiers (Advanced)","text":"Which sentence is the best revision of this awkward modifier placement? “Running down the street, the bus was caught by John.”","options":["Running down the street, John caught the bus.","The bus was caught by John, running down the street.","John caught the bus running down the street.","Caught by John, the bus was running down the street."],"correct":0,"explanation":"悬垂修饰语错误。Running down the street 的逻辑主语应该是 John，而不是 bus。修订后逻辑主语一致。"},{"id":67,"paper":"A","category":"Relative Clauses & Modifiers (Advanced)","text":"Identify the sentence with a misplaced modifier.","options":["The woman in the red dress bought a car.","He almost drove his children to school every day.","The book that I borrowed from the library is overdue.","She served sandwiches to the children on paper plates."],"correct":3,"explanation":"修饰语错位。on paper plates 应该修饰 served，放在这里让人误以为孩子们坐在纸盘上。更好的表达是 She served the children sandwiches on paper plates。"},{"id":68,"paper":"B","category":"Relative Clauses & Modifiers (Advanced)","text":"How can this sentence be improved for clarity? “Students who study often get higher grades.”","options":["Often, students who study get higher grades.","Students who often study get higher grades.","Higher grades are gotten by students who study often.","Students get higher grades who study often."],"correct":1,"explanation":"歧义修饰语 (Squinting modifier)。often 既可以修饰 study，也可以修饰 get。将其放在 study 之前消除了歧义。"},{"id":69,"paper":"A","category":"Relative Clauses & Modifiers (Advanced)","text":"Which version of the sentence is grammatically correct and clear?","options":["To bake a cake, the oven must be preheated.","To bake a cake, you must preheat the oven.","The oven must be preheated to bake a cake.","Preheating the oven is necessary to bake a cake."],"correct":1,"explanation":"悬垂修饰语错误。To bake a cake 的逻辑主语应该是人 (you)，而不是 oven。修订后逻辑主语一致。"},{"id":70,"paper":"B","category":"Relative Clauses & Modifiers (Advanced)","text":"Which sentence properly uses a relative clause?","options":["The company, that was founded in 1990, recently went bankrupt.","The company which was founded in 1990, recently went bankrupt.","The company, which was founded in 1990, recently went bankrupt.","The company that was founded in 1990, recently went bankrupt."],"correct":2,"explanation":"非限制性定语从句必须使用 which，不能使用 that，并且前后都需要加逗号。"}];
 
         // ================= 全局变量 =================
         let isTeacherAuthenticated = false;
-        let studentAnswers = new Array(questionsData.length).fill(null);
+        let activeQuestions = [];
+        let studentAnswers = [];
         let allCloudData = [];
 
         // ================= UI 绑定 =================
@@ -230,6 +179,18 @@
             document.getElementById('start-test-btn').addEventListener('click', () => {
                 const name = document.getElementById('student-name').value.trim();
                 if (!name) { alert('请输入姓名！'); return; }
+                
+                // 根据选择的试卷生成题目
+                const paperChoice = document.querySelector('input[name="paper-select"]:checked').value;
+                if (paperChoice === 'A') {
+                    activeQuestions = questionsData.filter(q => q.paper === 'A');
+                } else if (paperChoice === 'B') {
+                    activeQuestions = questionsData.filter(q => q.paper === 'B');
+                } else {
+                    activeQuestions = [...questionsData];
+                }
+                studentAnswers = new Array(activeQuestions.length).fill(null);
+
                 document.getElementById('student-info-card').classList.add('hidden');
                 document.getElementById('test-container').classList.remove('hidden');
                 document.getElementById('submit-test-btn').classList.remove('hidden');
@@ -243,24 +204,28 @@
                 }
                 
                 let score = 0;
-                questionsData.forEach((q, idx) => {
-                    if (studentAnswers[idx] === (idx % 4)) score++;
+                activeQuestions.forEach((q, idx) => {
+                    if (studentAnswers[idx] === q.correct) score++;
                 });
 
                 document.getElementById('test-container').classList.add('pointer-events-none', 'opacity-60');
                 document.getElementById('submit-test-btn').classList.add('hidden');
                 document.getElementById('result-container').classList.remove('hidden');
-                document.getElementById('score-display').innerHTML = `你的最终得分：<span class="text-blue-600 font-bold text-5xl">${score}</span> / ${questionsData.length}`;
+                document.getElementById('score-display').innerHTML = `你的最终得分：<span class="text-blue-600 font-bold text-5xl">${score}</span> / ${activeQuestions.length}`;
                 
                 showExplanations();
+
+                const paperChoice = document.querySelector('input[name="paper-select"]:checked').value;
 
                 try {
                     await addDoc(collection(db, "test_scores"), {
                         name: document.getElementById('student-name').value.trim(),
                         studentId: document.getElementById('student-id').value.trim() || '未提供',
+                        paper: paperChoice,
                         score: score,
-                        total: questionsData.length,
+                        total: activeQuestions.length,
                         studentAnswers: studentAnswers,
+                        questionIds: activeQuestions.map(q => q.id),
                         timestamp: serverTimestamp(),
                         dateStr: new Date().toLocaleString('zh-CN')
                     });
@@ -276,7 +241,7 @@
                 
                 if (inputEmail === 'xgzhcn@gmail.com' && inputCode === '629471') {
                     isTeacherAuthenticated = true;
-                    document.getElementById('teacher-code').value = ''; // 清空密码框
+                    document.getElementById('teacher-code').value = ''; 
                     document.getElementById('teacher-login-section').classList.add('hidden');
                     document.getElementById('teacher-dashboard').classList.remove('hidden');
                     fetchCloudScores();
@@ -293,21 +258,25 @@
         // 渲染试卷
         function renderQuestions() {
             const container = document.getElementById('test-container');
-            container.innerHTML = '<div class="bg-blue-50 text-blue-800 p-4 rounded-md mb-6 text-sm font-medium border border-blue-200">Instruction: Select the grammatically correct and academically appropriate revision for each item below.</div>';
+            container.innerHTML = '<div class="bg-blue-50 text-blue-800 p-4 rounded-md mb-6 text-sm font-medium border border-blue-200 shadow-sm">Instruction: Select the grammatically correct and academically appropriate revision for each item below.</div>';
             
-            questionsData.forEach((q, index) => {
+            activeQuestions.forEach((q, index) => {
                 const qDiv = document.createElement('div');
-                qDiv.className = 'bg-white rounded-lg shadow p-6 border-l-4 border-blue-500';
+                qDiv.className = 'bg-white rounded-lg shadow-sm p-6 border-l-4 border-blue-500 mb-6';
                 
                 // 题号和语法点类别
-                qDiv.innerHTML = `<h3 class="text-lg font-medium text-gray-900 mb-4">${index + 1}. ${q.text}</h3>`;
+                qDiv.innerHTML = `<h3 class="text-lg font-bold text-gray-900 mb-2">第 ${index + 1} 题 <span class="text-sm font-normal text-gray-500">(题库原号: ${q.id} | ${q.paper}卷)</span></h3>
+                                  <p class="text-gray-800 mb-5 font-medium">${q.category}</p>
+                                  <p class="text-gray-900 mb-6">${q.text}</p>`;
                 
                 const optionsDiv = document.createElement('div');
                 optionsDiv.className = 'space-y-3';
                 
                 q.options.forEach((optText, optIndex) => {
+                    if (!optText) return; // 跳过空选项
+                    
                     const label = document.createElement('label');
-                    label.className = 'flex items-start p-3 border border-gray-200 rounded-md cursor-pointer hover:bg-gray-50';
+                    label.className = 'flex items-start p-3 border border-gray-200 rounded-md cursor-pointer hover:bg-gray-50 transition-colors';
                     label.id = `label-q${index}-opt${optIndex}`;
                     
                     const radio = document.createElement('input');
@@ -316,20 +285,20 @@
                     radio.addEventListener('change', () => studentAnswers[index] = optIndex);
                     
                     label.appendChild(radio);
-                    label.insertAdjacentHTML('beforeend', `<span class="ml-3 text-gray-700">${String.fromCharCode(65 + optIndex)}. ${optText}</span>`);
+                    label.insertAdjacentHTML('beforeend', `<span class="ml-3 text-gray-700 leading-relaxed"><strong>${String.fromCharCode(65 + optIndex)}.</strong> ${optText}</span>`);
                     optionsDiv.appendChild(label);
                 });
                 
                 qDiv.appendChild(optionsDiv);
-                qDiv.insertAdjacentHTML('beforeend', `<div id="explanation-${index}" class="hidden mt-4 p-4 bg-gray-50 rounded text-sm border-t"></div>`);
+                qDiv.insertAdjacentHTML('beforeend', `<div id="explanation-${index}" class="hidden mt-5 p-4 bg-gray-50 rounded text-sm border-t border-gray-200"></div>`);
                 container.appendChild(qDiv);
             });
         }
 
         // 显示解析
         function showExplanations() {
-            questionsData.forEach((q, index) => {
-                const correct = index % 4;
+            activeQuestions.forEach((q, index) => {
+                const correct = q.correct;
                 const user = studentAnswers[index];
                 
                 if(document.getElementById(`label-q${index}-opt${correct}`)) {
@@ -341,22 +310,22 @@
                 
                 const expDiv = document.getElementById(`explanation-${index}`);
                 expDiv.classList.remove('hidden');
-                const status = (user === correct) ? `<span class="text-green-600 font-bold">正确！</span>` : `<span class="text-red-600 font-bold">错误。</span>`;
-                expDiv.innerHTML = `<p>${status} 正确答案: <strong>${String.fromCharCode(65 + correct)}</strong>。 ${q.explanation}</p>`;
+                const status = (user === correct) ? `<span class="text-green-600 font-bold">正确！</span>` : (user === null ? `<span class="text-gray-500 font-bold">未答。</span>` : `<span class="text-red-600 font-bold">错误。</span>`);
+                expDiv.innerHTML = `<p class="mb-2">${status} 正确答案: <strong>${String.fromCharCode(65 + correct)}</strong>。</p><p class="text-gray-600"><strong>解析：</strong> ${q.explanation}</p>`;
             });
         }
 
         // 获取云端数据
         async function fetchCloudScores() {
             const tbody = document.getElementById('student-data-body');
-            tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center">读取数据中...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">读取数据中...</td></tr>';
             try {
                 const q = query(collection(db, "test_scores"), orderBy("timestamp", "desc"));
                 const snapshot = await getDocs(q);
                 allCloudData = [];
                 
                 if (snapshot.empty) {
-                    tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center">暂无提交记录</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">暂无提交记录</td></tr>';
                     return;
                 }
                 
@@ -366,21 +335,25 @@
                     data.id = doc.id;
                     allCloudData.push(data);
                     
-                    const scoreColor = (data.score/data.total) >= 0.8 ? 'text-green-600' : 'text-blue-600';
+                    const scoreRatio = data.score / data.total;
+                    const scoreColor = scoreRatio >= 0.8 ? 'text-green-600' : (scoreRatio < 0.6 ? 'text-red-600' : 'text-blue-600');
+                    const paperType = data.paper === 'ALL' ? 'A+B全卷' : (data.paper ? data.paper + '卷' : '未知');
+                    
                     html += `
                         <tr class="hover:bg-gray-50">
                             <td class="px-6 py-4 text-sm font-medium text-gray-900">${data.name}</td>
                             <td class="px-6 py-4 text-sm text-gray-500">${data.studentId}</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">${paperType}</td>
                             <td class="px-6 py-4 text-sm font-bold ${scoreColor}">${data.score} / ${data.total}</td>
                             <td class="px-6 py-4 text-sm text-gray-400">${data.dateStr}</td>
                             <td class="px-6 py-4 text-center">
-                                <button onclick="toggleDetails('${doc.id}')" class="text-blue-600 hover:text-blue-900 text-sm font-medium">查看详情 ▾</button>
+                                <button onclick="toggleDetails('${doc.id}')" class="text-blue-600 hover:text-blue-900 text-sm font-medium transition-colors">查看详情 ▾</button>
                             </td>
                         </tr>
                         <tr id="details-${doc.id}" class="hidden details-row">
-                            <td colspan="5" class="px-6 py-4">
-                                <div class="text-sm text-gray-700 flex flex-wrap gap-2">
-                                    ${renderStudentAnswersDetail(data.studentAnswers, data.total)}
+                            <td colspan="6" class="px-6 py-4">
+                                <div class="text-sm text-gray-700 flex flex-wrap gap-1">
+                                    ${renderStudentAnswersDetail(data.studentAnswers, data.questionIds, data.total)}
                                 </div>
                             </td>
                         </tr>
@@ -388,7 +361,7 @@
                 });
                 tbody.innerHTML = html;
             } catch (error) {
-                tbody.innerHTML = `<tr><td colspan="5" class="text-center text-red-500 py-4">读取失败: ${error.message}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center text-red-500 py-4">读取失败: ${error.message}</td></tr>`;
             }
         }
 
@@ -397,19 +370,21 @@
             el.classList.toggle('hidden');
         };
 
-        function renderStudentAnswersDetail(answersArray, total) {
+        function renderStudentAnswersDetail(answersArray, qIds, total) {
             if(!answersArray || answersArray.length === 0) return "<span class='text-gray-400'>未记录详细选项</span>";
             let res = "";
-            for(let i=0; i<total; i++) {
-                const correct = i % 4;
-                const user = answersArray[i];
-                const charOpt = user !== null ? String.fromCharCode(65 + user) : '-';
-                if(user === correct) {
-                    res += `<span class="bg-green-100 text-green-800 px-2 py-1 rounded border border-green-200">Q${i+1}: ${charOpt}</span>`;
+            answersArray.forEach((userAns, idx) => {
+                let qId = qIds ? qIds[idx] : (idx + 1); 
+                let originalQ = questionsData.find(q => q.id === qId);
+                let correct = originalQ ? originalQ.correct : (qId % 4); 
+                
+                const charOpt = userAns !== null ? String.fromCharCode(65 + userAns) : '-';
+                if(userAns === correct) {
+                    res += `<span class="bg-green-50 text-green-800 px-2 py-1 rounded border border-green-200 mb-1 inline-block text-xs font-medium shadow-sm">Q${qId}: ${charOpt}</span>&nbsp;`;
                 } else {
-                    res += `<span class="bg-red-100 text-red-800 px-2 py-1 rounded border border-red-200" title="正确答案: ${String.fromCharCode(65 + correct)}">Q${i+1}: ${charOpt}</span>`;
+                    res += `<span class="bg-red-50 text-red-800 px-2 py-1 rounded border border-red-200 mb-1 inline-block text-xs font-medium shadow-sm" title="正确答案: ${String.fromCharCode(65 + correct)}">Q${qId}: ${charOpt}</span>&nbsp;`;
                 }
-            }
+            });
             return res;
         }
 
@@ -417,7 +392,7 @@
         async function clearRecords() {
             if(!confirm("⚠️ 警告：确定要清空所有云端成绩数据吗？此操作不可逆！")) return;
             const tbody = document.getElementById('student-data-body');
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4">正在清理云端数据...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-gray-500">正在清理云端数据...</td></tr>';
             
             try {
                 const q = query(collection(db, "test_scores"));
@@ -440,19 +415,35 @@
             }
             let csvContent = "data:text/csv;charset=utf-8,\uFEFF"; 
             
-            let header = "姓名,学号,得分,总分,提交时间";
-            for(let i=1; i<=questionsData.length; i++) header += `,题${i}`;
+            // 题库总共70题，建立统一的1-70列表头
+            let header = "姓名,学号,试卷,得分,总分,提交时间";
+            for(let i=1; i<=70; i++) header += `,题${i}`;
             csvContent += header + "\n";
 
             allCloudData.forEach(data => {
-                let row = `${data.name},${data.studentId},${data.score},${data.total},${data.dateStr}`;
-                if (data.studentAnswers) {
-                    for(let i=0; i<questionsData.length; i++) {
-                        let ans = data.studentAnswers[i];
+                const paperType = data.paper === 'ALL' ? 'A+B' : (data.paper || '未知');
+                let row = `${data.name},${data.studentId},${paperType},${data.score},${data.total},${data.dateStr}`;
+                
+                // 将该次考试的答案映射到 1-70 全局题号
+                let ansMap = {};
+                if (data.questionIds && data.studentAnswers) {
+                    data.questionIds.forEach((qid, idx) => {
+                        ansMap[qid] = data.studentAnswers[idx];
+                    });
+                } else if (data.studentAnswers) {
+                    // 兼容旧数据：直接按顺序1到N映射
+                    data.studentAnswers.forEach((ans, idx) => {
+                        ansMap[idx + 1] = ans;
+                    });
+                }
+
+                for(let i=1; i<=70; i++) {
+                    if (ansMap[i] !== undefined) {
+                        let ans = ansMap[i];
                         row += `,${ans !== null ? String.fromCharCode(65 + ans) : '未答'}`;
+                    } else {
+                        row += `,-`; // 该题不在该学生的试卷中
                     }
-                } else {
-                    row += "," + Array(questionsData.length).fill("无记录").join(",");
                 }
                 csvContent += row + "\n";
             });
