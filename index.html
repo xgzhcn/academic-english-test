@@ -91,7 +91,6 @@
                 </div>
             </div>
 
-            <!-- 学情面板 -->
             <div id="teacher-dashboard" class="hidden space-y-6">
                 <div class="flex flex-wrap gap-3 justify-between items-center bg-white p-4 rounded-lg shadow">
                     <h2 class="text-xl font-bold text-gray-800">学情分析概览</h2>
@@ -141,7 +140,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // ================= 完整40题题库 (严格A,B,C,D循环) =================
+        // ================= 完整40题题库 =================
         const questionsData = [];
         
         const rawSentences = [
@@ -187,7 +186,7 @@
             { t: "Informal Tone", o: "The 2018 report is a key document demonstrating the importance of job satisfaction, and it warrants careful consideration." }
         ];
 
-        // 自动生成40道题
+        // 生成干扰项（已移除泄漏答案的提示）
         rawSentences.forEach((item, i) => {
             const correctOptIndex = i % 4;
             const options = new Array(4);
@@ -204,13 +203,13 @@
             let distCount = 0;
             for(let j=0; j<4; j++) {
                 if(j !== correctOptIndex) {
-                    options[j] = distractors[distCount] + (distCount===0?" (Grammar error)":" (Syntax error)");
+                    options[j] = distractors[distCount]; // 移除了 "(Grammar error)" 等标记
                     distCount++;
                 }
             }
 
             questionsData.push({
-                text: `Editing Practice (${item.t}): Select the grammatically correct and academically appropriate revision.`,
+                text: item.t, // 只保留语法点名称（例如：Comma Splice）
                 options: options,
                 explanation: `Correct academic structure requires precise punctuation, matching subjects/verbs, and objective tone.`
             });
@@ -270,15 +269,14 @@
                 }
             });
 
-            // 教师端登录逻辑：同时验证邮箱和安全码
+            // 教师端登录
             document.getElementById('verify-login-btn').addEventListener('click', () => {
                 const inputEmail = document.getElementById('teacher-email').value.trim();
                 const inputCode = document.getElementById('teacher-code').value.trim();
                 
-                if (inputEmail === 'xgzhcn@gmail.com' && inputCode === '981216') {
+                if (inputEmail === 'xgzhcn@gmail.com' && inputCode === '629471') {
                     isTeacherAuthenticated = true;
-                    // 清空密码框保护隐私
-                    document.getElementById('teacher-code').value = '';
+                    document.getElementById('teacher-code').value = ''; // 清空密码框
                     document.getElementById('teacher-login-section').classList.add('hidden');
                     document.getElementById('teacher-dashboard').classList.remove('hidden');
                     fetchCloudScores();
@@ -292,13 +290,16 @@
             document.getElementById('export-csv-btn').addEventListener('click', exportToCSV);
         });
 
+        // 渲染试卷
         function renderQuestions() {
             const container = document.getElementById('test-container');
-            container.innerHTML = '';
+            container.innerHTML = '<div class="bg-blue-50 text-blue-800 p-4 rounded-md mb-6 text-sm font-medium border border-blue-200">Instruction: Select the grammatically correct and academically appropriate revision for each item below.</div>';
             
             questionsData.forEach((q, index) => {
                 const qDiv = document.createElement('div');
                 qDiv.className = 'bg-white rounded-lg shadow p-6 border-l-4 border-blue-500';
+                
+                // 题号和语法点类别
                 qDiv.innerHTML = `<h3 class="text-lg font-medium text-gray-900 mb-4">${index + 1}. ${q.text}</h3>`;
                 
                 const optionsDiv = document.createElement('div');
@@ -325,6 +326,7 @@
             });
         }
 
+        // 显示解析
         function showExplanations() {
             questionsData.forEach((q, index) => {
                 const correct = index % 4;
@@ -344,6 +346,7 @@
             });
         }
 
+        // 获取云端数据
         async function fetchCloudScores() {
             const tbody = document.getElementById('student-data-body');
             tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center">读取数据中...</td></tr>';
@@ -410,6 +413,7 @@
             return res;
         }
 
+        // 清空记录
         async function clearRecords() {
             if(!confirm("⚠️ 警告：确定要清空所有云端成绩数据吗？此操作不可逆！")) return;
             const tbody = document.getElementById('student-data-body');
@@ -429,6 +433,491 @@
             }
         }
 
+        // 导出表格
+        function exportToCSV() {
+            if(allCloudData.length === 0) {
+                alert("暂无数据可导出"); return;
+            }
+            let csvContent = "data:text/csv;charset=utf-8,\uFEFF"; 
+            
+            let header = "姓名,学号,得分,总分,提交时间";
+            for(let i=1; i<=questionsData.length; i++) header += `,题${i}`;
+            csvContent += header + "\n";
+
+            allCloudData.forEach(data => {
+                let row = `${data.name},${data.studentId},${data.score},${data.total},${data.dateStr}`;
+                if (data.studentAnswers) {
+                    for(let i=0; i<questionsData.length; i++) {
+                        let ans = data.studentAnswers[i];
+                        row += `,${ans !== null ? String.fromCharCode(65 + ans) : '未答'}`;
+                    }
+                } else {
+                    row += "," + Array(questionsData.length).fill("无记录").join(",");
+                }
+                csvContent += row + "\n";
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "学生语法测试成绩报表.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function switchTab(tab) {
+            if (tab === 'student') {
+                document.getElementById('tab-student').className = 'tab-active py-4 px-1 text-sm focus:outline-none';
+                document.getElementById('tab-teacher').className = 'tab-inactive py-4 px-1 text-sm focus:outline-none';
+                document.getElementById('student-section').classList.remove('hidden');
+                document.getElementById('teacher-section').classList.add('hidden');
+            } else {
+                document.getElementById('tab-teacher').className = 'tab-active py-4 px-1 text-sm focus:outline-none';
+                document.getElementById('tab-student').className = 'tab-inactive py-4 px-1 text-sm focus:outline-none';
+                document.getElementById('teacher-section').classList.remove('hidden');
+                document.getElementById('student-section').classList.add('hidden');
+                if (isTeacherAuthenticated) fetchCloudScores();
+            }
+        }
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>英语学术写作语法测试 (Academic English Grammar Test)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        .hidden { display: none !important; }
+        .tab-active { border-bottom: 2px solid #2563eb; color: #2563eb; font-weight: 600; }
+        .tab-inactive { color: #6b7280; font-weight: 400; }
+        .tab-inactive:hover { color: #374151; }
+        .details-row { background-color: #f8fafc; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+    <header class="bg-white shadow-sm sticky top-0 z-10">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div>
+                    <h1 class="text-xl font-bold text-gray-900">英语学术写作语法测试</h1>
+                    <p class="text-xs text-gray-500">Academic English Grammar & Editing Test</p>
+                </div>
+                <nav class="flex space-x-8">
+                    <button id="tab-student" class="tab-active py-4 px-1 text-sm focus:outline-none">学生端 (Student)</button>
+                    <button id="tab-teacher" class="tab-inactive py-4 px-1 text-sm focus:outline-none">教师端 (Teacher)</button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- ================= 学生端视图 ================= -->
+        <section id="student-section" class="space-y-8">
+            
+            <div id="student-info-card" class="bg-white rounded-lg shadow p-6">
+                <h2 class="text-lg font-medium text-gray-900 mb-4">考生信息 (Student Information)</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">姓名 (Name)</label>
+                        <input type="text" id="student-name" class="w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="例如：张三 (Zhang San)">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">学号 (Student ID) - 选填</label>
+                        <input type="text" id="student-id" class="w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="例如：2026001">
+                    </div>
+                </div>
+                <button id="start-test-btn" class="mt-6 w-full bg-blue-600 text-white font-medium py-2 px-4 rounded-md hover:bg-blue-700 transition-colors">
+                    开始测试 (Start Test)
+                </button>
+            </div>
+
+            <div id="test-container" class="hidden space-y-6"></div>
+
+            <button id="submit-test-btn" class="hidden w-full bg-green-600 text-white font-bold py-3 px-4 rounded-md hover:bg-green-700 transition-colors text-lg">
+                提交试卷 (Submit Test)
+            </button>
+
+            <div id="result-container" class="hidden bg-white rounded-lg shadow p-8 text-center">
+                <h2 class="text-3xl font-bold text-gray-900 mb-2">测试完成！</h2>
+                <div class="inline-block bg-blue-50 rounded-full px-8 py-4 mb-6 border border-blue-100 mt-4">
+                    <p id="score-display" class="text-xl text-gray-700">你的最终得分：<span class="text-blue-600 font-bold text-5xl">0</span> / 40</p>
+                </div>
+                <p class="text-gray-600">请向下滚动查看错题及详细解析。</p>
+            </div>
+        </section>
+
+        <!-- ================= 教师端视图 ================= -->
+        <section id="teacher-section" class="hidden space-y-6">
+            
+            <div id="teacher-login-section" class="bg-white rounded-lg shadow p-8 max-w-md mx-auto mt-12 border border-gray-200">
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900">教师端登录</h2>
+                    <p class="text-sm text-gray-500 mt-2">请输入管理员邮箱及专属安全码以查看学情数据。</p>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">管理员邮箱</label>
+                        <input type="email" id="teacher-email" placeholder="输入管理员邮箱" class="w-full border border-gray-300 rounded-md py-2 px-3 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">专属安全码 (Security Code)</label>
+                        <input type="password" id="teacher-code" placeholder="输入 6 位安全码" class="w-full border border-gray-300 rounded-md py-2 px-3 text-center tracking-widest text-lg font-mono focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <button id="verify-login-btn" class="w-full bg-blue-600 text-white font-medium py-2 px-4 rounded-md hover:bg-blue-700 transition-colors mt-4">
+                        验证并登录
+                    </button>
+                </div>
+            </div>
+
+            <div id="teacher-dashboard" class="hidden space-y-6">
+                <div class="flex flex-wrap gap-3 justify-between items-center bg-white p-4 rounded-lg shadow">
+                    <h2 class="text-xl font-bold text-gray-800">学情分析概览</h2>
+                    <div class="flex space-x-2">
+                        <button id="export-csv-btn" class="text-sm bg-green-50 hover:bg-green-100 text-green-700 py-1.5 px-3 rounded border border-green-200 font-medium">导出 Excel (CSV)</button>
+                        <button id="refresh-data-btn" class="text-sm bg-blue-50 hover:bg-blue-100 text-blue-700 py-1.5 px-3 rounded border border-blue-200 font-medium">刷新数据</button>
+                        <button id="clear-records-btn" class="text-sm bg-red-50 hover:bg-red-100 text-red-700 py-1.5 px-3 rounded border border-red-200 font-medium">清空记录</button>
+                    </div>
+                </div>
+                
+                <div class="bg-white shadow rounded-lg overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">姓名</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">学号</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">得分</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">提交时间</th>
+                                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="student-data-body" class="bg-white divide-y divide-gray-200">
+                            <tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">加载中...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, query, orderBy, serverTimestamp, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBPl3fGVPooN3CZhB5FFqwWpMRDuDGGpgc",
+            authDomain: "academic-english-test.firebaseapp.com",
+            projectId: "academic-english-test",
+            storageBucket: "academic-english-test.firebasestorage.app",
+            messagingSenderId: "491940137236",
+            appId: "1:491940137236:web:04bae27c45224b2b429a01",
+            measurementId: "G-14ZGDLZX0P"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // ================= 完整40题题库 =================
+        const questionsData = [];
+        
+        const rawSentences = [
+            { t: "Comma Splice", o: "Côté and Morgan have shown that emotion regulation influences job satisfaction, and that amplifying positive emotions increases positive interactions." },
+            { t: "Punctuation", o: "The business decisions managers take can have significant implications; however, most managers do not have training in business ethics." },
+            { t: "Relative Clause", o: "The World Wide Web is a constantly developing technology that has many advantages for society." },
+            { t: "Semicolon", o: "Lupton (1998) claims that the public is interested in health news; however, I argue that media coverage does not indicate genuine public interest." },
+            { t: "Transition", o: "Wolf (2008) argues that business should not concern itself with social consequences; on the other hand, Svensson and Wood claim that business and society are co-dependent." },
+            { t: "Apostrophe", o: "Some theologists think that therapeutic cloning is acceptable." },
+            { t: "Possessive", o: "Greenpeace states that one of its aims is to expose threats to the environment." },
+            { t: "Possessive Noun", o: "A country's government usually resides in the capital city." },
+            { t: "Possessive", o: "An employee's career is influenced by many different factors." },
+            { t: "Plural Possessive", o: "We analysed the students' questionnaires using this university's own software programme." },
+            { t: "Unnecessary Comma", o: "It has been shown in this essay that this is not the case." },
+            { t: "Complement Clause", o: "It is illogical that people think pollution is not important." },
+            { t: "That Clause", o: "The fact is that we cannot determine the outcome." },
+            { t: "Colon usage", o: "This essay will discuss the most important aspect of genetic research: cloning." },
+            { t: "Reporting Verb", o: "Lenin (1914) claimed that a nation could not be truly free while it oppressed other nations." },
+            { t: "Parallelism", o: "Collins (1994) suggests that if businesses do not operate with a degree of trust and co-operation, they will put constraints on profitability." },
+            { t: "Parallelism", o: "What the 2017 World Happiness Report suggests is that people need to feel that they have social support, are able to make choices, and can trust national institutions." },
+            { t: "Faulty Comparison", o: "Our survey revealed that students generally find reading journal articles more difficult than listening to lectures." },
+            { t: "List Balance", o: "Skrzypiec (2017) uses the ITT model to test how important drug use, fighting, and theft are as factors in adolescents’ intention to transgress." },
+            { t: "List Balance", o: "Having good neighbours, socialising, and accessing available help are all key factors in community support for the elderly." },
+            { t: "Subject Verb", o: "Smith et al. (2000) report that this level of violence is harmful." },
+            { t: "Uncountable Noun", o: "Recent research also shows that the drugs are effective." },
+            { t: "Subject Verb", o: "Malicious software such as worms has been increasingly used." },
+            { t: "Plural Subject", o: "The two types differ in the way they can be treated." },
+            { t: "Collective Noun", o: "A research company has recently produced a new report." },
+            { t: "Tense Consistency", o: "Wolf (2008) shares this view and Prindle (2009) also suggests that..." },
+            { t: "Tense Consistency", o: "The solution was put into the test tube and heated to 90 degrees." },
+            { t: "Conditional", o: "If this theory is correct, it will mean that all previous data must be reviewed." },
+            { t: "Tense Match", o: "Ariti et al. (2018) argue that farmer participation increases ownership, and they also suggest that it helps social cohesion." },
+            { t: "Academic Verb", o: "Geizen (2012) states that it is important to keep a megaproject as simple as possible." },
+            { t: "Verb Pattern", o: "The model is capable of making accurate predictions." },
+            { t: "Infinitive", o: "The increase in greenhouse gases causes the temperature to rise." },
+            { t: "Transitive Verb", o: "We discussed increasing the number of employees." },
+            { t: "Infinitive", o: "The failure of cells to remove sugars causes diabetes." },
+            { t: "Preposition", o: "Lewes (2000) rejects the idea of using DNA as evidence of guilt." },
+            { t: "Pronoun Clarity", o: "According to Giezen’s model, the probability of budget overrun in a megaproject can often be reduced by keeping the project as simple as possible." },
+            { t: "Ambiguity", o: "Players and team coaches were classified according to sport and the number of games the players currently played each season." },
+            { t: "Subjective Tone", o: "The city’s transport policy will lead to an increase in traffic; this is the primary issue to consider at this meeting." },
+            { t: "Vague Pronoun", o: "If these personal road accident stories are shared, the number of accidents will hopefully be reduced." },
+            { t: "Informal Tone", o: "The 2018 report is a key document demonstrating the importance of job satisfaction, and it warrants careful consideration." }
+        ];
+
+        // 生成干扰项（已移除泄漏答案的提示）
+        rawSentences.forEach((item, i) => {
+            const correctOptIndex = i % 4;
+            const options = new Array(4);
+            
+            const distractors = [
+                item.o.replace(/, /g, " ").replace(/;/g, ","),
+                item.o.replace(/ is /g, " are ").replace(/ has /g, " have ").replace(/s /g, " "),
+                item.o.replace(/ of /g, " for ").replace(/ to /g, " on "),
+                item.o.replace(/ing /g, "ed ").replace(/ed /g, "ing ")
+            ];
+            
+            options[correctOptIndex] = item.o;
+            
+            let distCount = 0;
+            for(let j=0; j<4; j++) {
+                if(j !== correctOptIndex) {
+                    options[j] = distractors[distCount]; // 移除了 "(Grammar error)" 等标记
+                    distCount++;
+                }
+            }
+
+            questionsData.push({
+                text: item.t, // 只保留语法点名称（例如：Comma Splice）
+                options: options,
+                explanation: `Correct academic structure requires precise punctuation, matching subjects/verbs, and objective tone.`
+            });
+        });
+
+        // ================= 全局变量 =================
+        let isTeacherAuthenticated = false;
+        let studentAnswers = new Array(questionsData.length).fill(null);
+        let allCloudData = [];
+
+        // ================= UI 绑定 =================
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            document.getElementById('tab-student').addEventListener('click', () => switchTab('student'));
+            document.getElementById('tab-teacher').addEventListener('click', () => switchTab('teacher'));
+
+            // 开始考试
+            document.getElementById('start-test-btn').addEventListener('click', () => {
+                const name = document.getElementById('student-name').value.trim();
+                if (!name) { alert('请输入姓名！'); return; }
+                document.getElementById('student-info-card').classList.add('hidden');
+                document.getElementById('test-container').classList.remove('hidden');
+                document.getElementById('submit-test-btn').classList.remove('hidden');
+                renderQuestions();
+            });
+
+            // 提交考卷
+            document.getElementById('submit-test-btn').addEventListener('click', async () => {
+                if (studentAnswers.includes(null)) {
+                    if(!confirm('还有未作答的题目，确定交卷吗？')) return;
+                }
+                
+                let score = 0;
+                questionsData.forEach((q, idx) => {
+                    if (studentAnswers[idx] === (idx % 4)) score++;
+                });
+
+                document.getElementById('test-container').classList.add('pointer-events-none', 'opacity-60');
+                document.getElementById('submit-test-btn').classList.add('hidden');
+                document.getElementById('result-container').classList.remove('hidden');
+                document.getElementById('score-display').innerHTML = `你的最终得分：<span class="text-blue-600 font-bold text-5xl">${score}</span> / ${questionsData.length}`;
+                
+                showExplanations();
+
+                try {
+                    await addDoc(collection(db, "test_scores"), {
+                        name: document.getElementById('student-name').value.trim(),
+                        studentId: document.getElementById('student-id').value.trim() || '未提供',
+                        score: score,
+                        total: questionsData.length,
+                        studentAnswers: studentAnswers,
+                        timestamp: serverTimestamp(),
+                        dateStr: new Date().toLocaleString('zh-CN')
+                    });
+                } catch (e) {
+                    alert("成绩同步失败: " + e.message);
+                }
+            });
+
+            // 教师端登录
+            document.getElementById('verify-login-btn').addEventListener('click', () => {
+                const inputEmail = document.getElementById('teacher-email').value.trim();
+                const inputCode = document.getElementById('teacher-code').value.trim();
+                
+                if (inputEmail === 'xgzhcn@gmail.com' && inputCode === '629471') {
+                    isTeacherAuthenticated = true;
+                    document.getElementById('teacher-code').value = ''; // 清空密码框
+                    document.getElementById('teacher-login-section').classList.add('hidden');
+                    document.getElementById('teacher-dashboard').classList.remove('hidden');
+                    fetchCloudScores();
+                } else {
+                    alert("登录失败！请输入正确的管理员邮箱和专属安全码。");
+                }
+            });
+
+            document.getElementById('refresh-data-btn').addEventListener('click', fetchCloudScores);
+            document.getElementById('clear-records-btn').addEventListener('click', clearRecords);
+            document.getElementById('export-csv-btn').addEventListener('click', exportToCSV);
+        });
+
+        // 渲染试卷
+        function renderQuestions() {
+            const container = document.getElementById('test-container');
+            container.innerHTML = '<div class="bg-blue-50 text-blue-800 p-4 rounded-md mb-6 text-sm font-medium border border-blue-200">Instruction: Select the grammatically correct and academically appropriate revision for each item below.</div>';
+            
+            questionsData.forEach((q, index) => {
+                const qDiv = document.createElement('div');
+                qDiv.className = 'bg-white rounded-lg shadow p-6 border-l-4 border-blue-500';
+                
+                // 题号和语法点类别
+                qDiv.innerHTML = `<h3 class="text-lg font-medium text-gray-900 mb-4">${index + 1}. ${q.text}</h3>`;
+                
+                const optionsDiv = document.createElement('div');
+                optionsDiv.className = 'space-y-3';
+                
+                q.options.forEach((optText, optIndex) => {
+                    const label = document.createElement('label');
+                    label.className = 'flex items-start p-3 border border-gray-200 rounded-md cursor-pointer hover:bg-gray-50';
+                    label.id = `label-q${index}-opt${optIndex}`;
+                    
+                    const radio = document.createElement('input');
+                    radio.type = 'radio'; radio.name = `q-${index}`; radio.value = optIndex;
+                    radio.className = 'mt-1 h-4 w-4 text-blue-600 border-gray-300';
+                    radio.addEventListener('change', () => studentAnswers[index] = optIndex);
+                    
+                    label.appendChild(radio);
+                    label.insertAdjacentHTML('beforeend', `<span class="ml-3 text-gray-700">${String.fromCharCode(65 + optIndex)}. ${optText}</span>`);
+                    optionsDiv.appendChild(label);
+                });
+                
+                qDiv.appendChild(optionsDiv);
+                qDiv.insertAdjacentHTML('beforeend', `<div id="explanation-${index}" class="hidden mt-4 p-4 bg-gray-50 rounded text-sm border-t"></div>`);
+                container.appendChild(qDiv);
+            });
+        }
+
+        // 显示解析
+        function showExplanations() {
+            questionsData.forEach((q, index) => {
+                const correct = index % 4;
+                const user = studentAnswers[index];
+                
+                if(document.getElementById(`label-q${index}-opt${correct}`)) {
+                    document.getElementById(`label-q${index}-opt${correct}`).classList.add('border-green-500', 'bg-green-50');
+                }
+                if (user !== null && user !== correct && document.getElementById(`label-q${index}-opt${user}`)) {
+                    document.getElementById(`label-q${index}-opt${user}`).classList.add('border-red-500', 'bg-red-50');
+                }
+                
+                const expDiv = document.getElementById(`explanation-${index}`);
+                expDiv.classList.remove('hidden');
+                const status = (user === correct) ? `<span class="text-green-600 font-bold">正确！</span>` : `<span class="text-red-600 font-bold">错误。</span>`;
+                expDiv.innerHTML = `<p>${status} 正确答案: <strong>${String.fromCharCode(65 + correct)}</strong>。 ${q.explanation}</p>`;
+            });
+        }
+
+        // 获取云端数据
+        async function fetchCloudScores() {
+            const tbody = document.getElementById('student-data-body');
+            tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center">读取数据中...</td></tr>';
+            try {
+                const q = query(collection(db, "test_scores"), orderBy("timestamp", "desc"));
+                const snapshot = await getDocs(q);
+                allCloudData = [];
+                
+                if (snapshot.empty) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center">暂无提交记录</td></tr>';
+                    return;
+                }
+                
+                let html = '';
+                snapshot.forEach((doc, docIndex) => {
+                    const data = doc.data();
+                    data.id = doc.id;
+                    allCloudData.push(data);
+                    
+                    const scoreColor = (data.score/data.total) >= 0.8 ? 'text-green-600' : 'text-blue-600';
+                    html += `
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 text-sm font-medium text-gray-900">${data.name}</td>
+                            <td class="px-6 py-4 text-sm text-gray-500">${data.studentId}</td>
+                            <td class="px-6 py-4 text-sm font-bold ${scoreColor}">${data.score} / ${data.total}</td>
+                            <td class="px-6 py-4 text-sm text-gray-400">${data.dateStr}</td>
+                            <td class="px-6 py-4 text-center">
+                                <button onclick="toggleDetails('${doc.id}')" class="text-blue-600 hover:text-blue-900 text-sm font-medium">查看详情 ▾</button>
+                            </td>
+                        </tr>
+                        <tr id="details-${doc.id}" class="hidden details-row">
+                            <td colspan="5" class="px-6 py-4">
+                                <div class="text-sm text-gray-700 flex flex-wrap gap-2">
+                                    ${renderStudentAnswersDetail(data.studentAnswers, data.total)}
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                });
+                tbody.innerHTML = html;
+            } catch (error) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center text-red-500 py-4">读取失败: ${error.message}</td></tr>`;
+            }
+        }
+
+        window.toggleDetails = function(docId) {
+            const el = document.getElementById(`details-${docId}`);
+            el.classList.toggle('hidden');
+        };
+
+        function renderStudentAnswersDetail(answersArray, total) {
+            if(!answersArray || answersArray.length === 0) return "<span class='text-gray-400'>未记录详细选项</span>";
+            let res = "";
+            for(let i=0; i<total; i++) {
+                const correct = i % 4;
+                const user = answersArray[i];
+                const charOpt = user !== null ? String.fromCharCode(65 + user) : '-';
+                if(user === correct) {
+                    res += `<span class="bg-green-100 text-green-800 px-2 py-1 rounded border border-green-200">Q${i+1}: ${charOpt}</span>`;
+                } else {
+                    res += `<span class="bg-red-100 text-red-800 px-2 py-1 rounded border border-red-200" title="正确答案: ${String.fromCharCode(65 + correct)}">Q${i+1}: ${charOpt}</span>`;
+                }
+            }
+            return res;
+        }
+
+        // 清空记录
+        async function clearRecords() {
+            if(!confirm("⚠️ 警告：确定要清空所有云端成绩数据吗？此操作不可逆！")) return;
+            const tbody = document.getElementById('student-data-body');
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4">正在清理云端数据...</td></tr>';
+            
+            try {
+                const q = query(collection(db, "test_scores"));
+                const snapshot = await getDocs(q);
+                const deletePromises = [];
+                snapshot.forEach((d) => deletePromises.push(deleteDoc(doc(db, "test_scores", d.id))));
+                await Promise.all(deletePromises);
+                alert("所有数据已成功清除！");
+                fetchCloudScores();
+            } catch (e) {
+                alert("清除失败: " + e.message);
+                fetchCloudScores();
+            }
+        }
+
+        // 导出表格
         function exportToCSV() {
             if(allCloudData.length === 0) {
                 alert("暂无数据可导出"); return;
