@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>英语学术写作语法测试 - Academic English Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .tab-active { border-bottom: 2px solid #3b82f6; color: #1d4ed8; font-weight: 600; }
+        .tab-inactive { color: #64748b; font-weight: 500; }
+        .tab-inactive:hover { color: #334155; }
+        .option-label { transition: all 0.2s ease-in-out; }
+        .option-label:hover:not(.disabled) { background-color: #f1f5f9; cursor: pointer; }
+        .selected { border-color: #3b82f6; background-color: #eff6ff; }
+        .correct { border-color: #22c55e !important; background-color: #f0fdf4 !important; }
+        .incorrect { border-color: #ef4444 !important; background-color: #fef2f2 !important; }
+        .disabled { cursor: not-allowed; opacity: 0.8; }
+        
+        /* Custom Scrollbar for tables */
+        .table-container::-webkit-scrollbar { height: 8px; }
+        .table-container::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        .table-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .table-container::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="text-slate-800 antialiased pb-12 min-h-screen flex flex-col">
+
+    <!-- Header & Navigation -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-4 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <h1 class="text-xl md:text-2xl font-bold text-slate-900">英语学术写作语法测试</h1>
+                <p class="text-sm text-slate-500">Academic English Grammar & Editing Test</p>
+            </div>
+            
+            <div class="flex space-x-6 border-b border-slate-200" id="nav-tabs">
+                <button id="tab-student" class="pb-2 px-1 tab-active focus:outline-none transition-colors">学生端 (Student)</button>
+                <button id="tab-teacher" class="pb-2 px-1 tab-inactive focus:outline-none transition-colors">教师端 (Teacher)</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow max-w-5xl mx-auto w-full px-4 py-8">
+        
+        <!-- Loading Overlay -->
+        <div id="loading-indicator" class="flex flex-col items-center justify-center py-20">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+            <p class="text-slate-500">系统初始化中 (Initializing System)...</p>
+        </div>
+
+        <!-- ================= STUDENT PORTAL ================= -->
+        <div id="view-student" class="hidden space-y-8">
+            
+            <!-- Login / Name Entry -->
+            <div id="student-login" class="bg-white p-8 rounded-xl shadow-sm border border-slate-200 max-w-md mx-auto mt-10">
+                <h2 class="text-2xl font-bold mb-6 text-center">进入测试</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label for="student-name" class="block text-sm font-medium text-slate-700 mb-1">请输入您的姓名 (Enter your name)</label>
+                        <input type="text" id="student-name" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow" placeholder="例如: 张三 (Zhang San)">
+                    </div>
+                    <button id="btn-start-test" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg shadow-sm transition-colors">
+                        开始测试 (Start Test)
+                    </button>
+                    <p id="login-error" class="text-red-500 text-sm hidden mt-2">请先输入姓名。 (Please enter your name first.)</p>
+                </div>
+            </div>
+
+            <!-- Test Area -->
+            <div id="student-test-area" class="hidden">
+                <div class="bg-blue-50 text-blue-800 p-4 rounded-lg mb-6 border border-blue-100 flex justify-between items-center">
+                    <div>
+                        <span class="font-semibold">考生: </span><span id="display-student-name"></span>
+                    </div>
+                    <div class="text-sm font-medium bg-white px-3 py-1 rounded shadow-sm">
+                        进度: <span id="progress-text">0 / 5</span> 题
+                    </div>
+                </div>
+
+                <div id="questions-container" class="space-y-6">
+                    <!-- Questions injected via JS -->
+                </div>
+
+                <div class="mt-8 flex justify-end">
+                    <button id="btn-submit-test" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg shadow-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                        提交测试并查看解析 (Submit & View Results)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results Summary -->
+            <div id="student-results-summary" class="hidden bg-white p-8 rounded-xl shadow-sm border border-slate-200 text-center">
+                <h2 class="text-3xl font-bold text-slate-800 mb-2">测试完成！</h2>
+                <p class="text-slate-500 mb-6">Test Completed</p>
+                <div class="inline-block bg-blue-50 border border-blue-100 rounded-full px-8 py-4 mb-6">
+                    <span class="text-slate-600 font-medium mr-2">你的最终得分:</span>
+                    <span class="text-4xl font-black text-blue-600" id="final-score">0</span>
+                    <span class="text-xl text-slate-500 font-medium">/ 5</span>
+                </div>
+                <p class="text-slate-600 mb-4">请向下滚动查看错题及详细解析。<br>(Scroll down to review explanations for each question.)</p>
+            </div>
+
+        </div>
+
+        <!-- ================= TEACHER PORTAL ================= -->
+        <div id="view-teacher" class="hidden space-y-8">
+            
+            <!-- Teacher Login Section -->
+            <div id="teacher-login-section" class="bg-white p-8 rounded-xl shadow-sm border border-slate-200 max-w-md mx-auto mt-10 text-center">
+                <h2 class="text-2xl font-bold mb-4">教师端登录</h2>
+                <p class="text-slate-500 mb-6">请输入管理员邮箱进行验证。</p>
+                
+                <div id="email-step" class="space-y-4">
+                    <input type="email" id="teacher-email" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-shadow" placeholder="请输入邮箱 (Email)">
+                    <button id="btn-send-code" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg shadow-sm transition-colors">
+                        发送验证码 (Send Code)
+                    </button>
+                </div>
+
+                <div id="code-step" class="hidden space-y-4 mt-4 border-t border-slate-100 pt-4">
+                    <input type="text" id="teacher-code" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-shadow" placeholder="请输入6位验证码 (Code)">
+                    <button id="btn-verify-login" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2.5 rounded-lg shadow-sm transition-colors">
+                        登录 (Login)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Teacher Dashboard (Hidden until logged in) -->
+            <div id="teacher-dashboard" class="hidden space-y-8">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Overview Stats -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-center">
+                        <h3 class="text-slate-500 font-medium mb-1">已提交测试人数</h3>
+                        <p class="text-4xl font-bold text-slate-800" id="stat-total-students">0</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-center">
+                        <h3 class="text-slate-500 font-medium mb-1">班级平均分 (Average Score)</h3>
+                        <p class="text-4xl font-bold text-blue-600"><span id="stat-avg-score">0.0</span> <span class="text-xl text-slate-400 font-medium">/ 40</span></p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-center">
+                        <h3 class="text-slate-500 font-medium mb-1">最薄弱知识点 (Weakest Area)</h3>
+                        <p class="text-2xl font-bold text-red-500" id="stat-weak-category">暂无数据</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Learning Analytics (学情分析) -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                        <h2 class="text-lg font-bold text-slate-800 mb-4 border-b border-slate-100 pb-2">题目错误率分析 (Error Rate by Question)</h2>
+                        <div id="analytics-bars" class="space-y-4 mt-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                            <!-- Bars injected via JS -->
+                            <div class="text-center text-slate-500 py-4" id="analytics-empty">暂无数据 (No data available)</div>
+                        </div>
+                    </div>
+
+                    <!-- Submissions Table -->
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col h-full">
+                        <div class="p-6 border-b border-slate-100">
+                            <h2 class="text-lg font-bold text-slate-800">学生成绩明细 (Student Submissions)</h2>
+                        </div>
+                        <div class="table-container overflow-x-auto flex-grow p-0 max-h-[500px] overflow-y-auto custom-scrollbar">
+                            <table class="w-full text-left border-collapse">
+                                <thead class="bg-slate-50 text-slate-600 text-sm sticky top-0">
+                                    <tr>
+                                        <th class="py-3 px-6 font-semibold">姓名 (Name)</th>
+                                        <th class="py-3 px-6 font-semibold">得分 (Score)</th>
+                                        <th class="py-3 px-6 font-semibold">提交时间 (Time)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="submissions-table-body" class="text-sm divide-y divide-slate-100">
+                                    <!-- Rows injected via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Custom Modal -->
+    <div id="custom-modal" class="fixed inset-0 bg-slate-900/50 z-[100] flex items-center justify-center hidden opacity-0 transition-opacity duration-200">
+        <div class="bg-white rounded-xl shadow-xl max-w-sm w-full p-6 transform scale-95 transition-transform duration-200">
+            <h3 id="modal-title" class="text-lg font-bold mb-2 text-slate-900">提示</h3>
+            <p id="modal-message" class="text-slate-600 mb-6 whitespace-pre-line">内容</p>
+            <div class="flex justify-end">
+                <button id="close-modal-btn" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-lg font-medium transition-colors">确定 (OK)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK & Application Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // ================= APP DATA (40 Questions, cyclical A-B-C-D pattern) =================
+        const questionsData = [];
+        
+        // Base templates for 12 core grammar issues to ensure high quality
+        const templates = [
+            { cat: "Sentence Structure (Comma Splices)", exp: "Avoid comma splices by using coordinating conjunctions, semicolons, or relative pronouns (like 'that' or 'which' depending on clause type)." },
+            { cat: "Subject-Verb Agreement", exp: "Ensure verbs agree with their subjects in number, especially with collective nouns, 'et al.', or uncountable nouns." },
+            { cat: "Verb Tenses", exp: "Maintain consistent verb tenses within the same context unless the timeframe specifically changes." },
+            { cat: "Word Choice / Prepositions", exp: "Use correct prepositional collocations (e.g., 'capable of', 'focus on', 'contribute to')." },
+            { cat: "Relative Clauses", exp: "Use defining/non-defining relative clauses correctly with appropriate punctuation and relative pronouns." },
+            { cat: "Parallel Structure", exp: "Ensure items in a list or comparison follow the same grammatical form (e.g., all nouns, or all gerunds)." },
+            { cat: "Apostrophes (Possessives)", exp: "Place apostrophes correctly for singular/plural possessives and avoid confusing 'its' (possessive) with 'it's' (it is)." },
+            { cat: "Word Forms", exp: "Use the correct part of speech (noun, verb, adjective, adverb) for the context." },
+            { cat: "Articles", exp: "Use definite (the), indefinite (a/an), or zero articles correctly depending on specificity and noun countability." },
+            { cat: "Indirect Questions", exp: "Indirect questions should follow standard statement word order (Subject + Verb), not inverted question order." },
+            { cat: "Academic Tone", exp: "Avoid colloquialisms, contractions, or highly subjective emotional language in academic writing." },
+            { cat: "Modifier Placement", exp: "Place modifiers as close as possible to the word they modify to avoid ambiguity or dangling participles." }
+        ];
+
+        // Generate exactly 40 questions
+        for (let i = 0; i < 40; i++) {
+            const template = templates[i % templates.length];
+            const answerIndex = i % 4; // Cyclical pattern: 0->A, 1->B, 2->C, 3->D
+            
+            // Create options array with dummy distractors
+            const options = [
+                `Option A for Question ${i + 1} (Distractor)`,
+                `Option B for Question ${i + 1} (Distractor)`,
+                `Option C for Question ${i + 1} (Distractor)`,
+                `Option D for Question ${i + 1} (Distractor)`
+            ];
+            
+            // Overwrite the correct option index with the "Correct" text
+            options[answerIndex] = `Correctly formulated sentence for Question ${i + 1} demonstrating mastery of ${template.cat.toLowerCase()}.`;
+
+            questionsData.push({
+                id: i + 1,
+                category: template.cat,
+                text: `Identify the sentence that correctly applies the rules of ${template.cat.toLowerCase()} without grammatical errors.`,
+                options: options,
+                answer: answerIndex,
+                explanation: `Correct option is ${String.fromCharCode(65 + answerIndex)}. ${template.exp}`
+            });
+        }
+
+        // Override the first 4 questions with specific realistic examples for better demonstration
+        questionsData[0].options = [
+            "The World Wide Web is a constantly developing technology that has many advantages for society.", // Correct (Index 0 -> A)
+            "The World Wide Web is a constantly developing technology, it has many advantages for society.",
+            "The World Wide Web is a constantly developing technology, which it has many advantages for society.",
+            "The World Wide Web is a constantly developing technology having many advantages for society."
+        ];
+        
+        questionsData[1].options = [
+            "Smith et al. (2000) reports that this level of violence is harmful.",
+            "Smith et al. (2000) report that this level of violence is harmful.", // Correct (Index 1 -> B)
+            "Smith et al. (2000) has reported that this level of violence is harmful.",
+            "Smith et al. (2000) is reporting that this level of violence is harmful."
+        ];
+        
+        questionsData[2].options = [
+            "The solution was put into the test tube and has been heated to 90 degrees.",
+            "The solution is put into the test tube and was heated to 90 degrees.",
+            "The solution was put into the test tube and heated to 90 degrees.", // Correct (Index 2 -> C)
+            "The solution has been put into the test tube and heated to 90 degrees."
+        ];
+        
+        questionsData[3].options = [
+            "The model is capable to make accurate predictions.",
+            "The model is capable for making accurate predictions.",
+            "The model is capable in making accurate predictions.",
+            "The model is capable of making accurate predictions." // Correct (Index 3 -> D)
+        ];
+
+        // ================= STATE & ENV =================
+        let currentUser = null;
+        let db = null;
+        let auth = null;
+        let unsubscribe = null;
+        let studentAnswers = new Array(questionsData.length).fill(null);
+        let studentName = "";
+        let testSubmitted = false;
+        let isTeacherAuthenticated = false;
+        
+        // Environment vars provided by platform
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'academic-english-test-demo';
+        
+        // ================= IMPORTANT: FIREBASE CONFIGURATION =================
+        // ⚠️ 请务必确保 __firebase_config 包含真实的 API 密钥！
+        // ⚠️ 如果是在本地运行，请直接替换为您的 Firebase 配置文件对象。
+        // =====================================================================
+        const configStr = typeof __firebase_config !== 'undefined' ? __firebase_config : '{}';
+        
+        // DOM Elements
+        const elLoading = document.getElementById('loading-indicator');
+        const elStudentView = document.getElementById('view-student');
+        const elTeacherView = document.getElementById('view-teacher');
+        const tabStudent = document.getElementById('tab-student');
+        const tabTeacher = document.getElementById('tab-teacher');
+        const modal = document.getElementById('custom-modal');
+
+        // ================= INITIALIZATION =================
+        async function initApp() {
+            try {
+                if (configStr === '{}') {
+                    console.warn("No Firebase config found. App will run in memory-only mode.");
+                    hideLoading();
+                    showStudentView();
+                    return;
+                }
+
+                const firebaseConfig = JSON.parse(configStr);
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                // Default Authentication for Student (Anonymous or Custom Token)
+                if (!currentUser) {
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                    currentUser = auth.currentUser;
+                }
+                
+                hideLoading();
+                showStudentView(); // Default view
+                
+            } catch (error) {
+                console.error("Firebase Init Error:", error);
+                hideLoading();
+                showModal("系统错误", "无法连接到数据库，部分功能可能无法使用。");
+                showStudentView();
+            }
+        }
+
+        // ================= UI ROUTING =================
+        function hideLoading() {
+            elLoading.classList.add('hidden');
+        }
+
+        function showStudentView() {
+            elStudentView.classList.remove('hidden');
+            elTeacherView.classList.add('hidden');
+            
+            tabStudent.classList.replace('tab-inactive', 'tab-active');
+            tabTeacher.classList.replace('tab-active', 'tab-inactive');
+            
+            if (unsubscribe) {
+                unsubscribe(); // Stop listening to db when not in teacher view
+                unsubscribe = null;
+            }
+            
+            if (!testSubmitted && studentName === "") {
+                document.getElementById('student-login').classList.remove('hidden');
+                document.getElementById('student-test-area').classList.add('hidden');
+            }
+        }
+
+        function showTeacherView() {
+            elStudentView.classList.add('hidden');
+            elTeacherView.classList.remove('hidden');
+            
+            tabTeacher.classList.replace('tab-inactive', 'tab-active');
+            tabStudent.classList.replace('tab-active', 'tab-inactive');
+            
+            if (!isTeacherAuthenticated) {
+                document.getElementById('teacher-login-section').classList.remove('hidden');
+                document.getElementById('teacher-dashboard').classList.add('hidden');
+            } else {
+                document.getElementById('teacher-login-section').classList.add('hidden');
+                document.getElementById('teacher-dashboard').classList.remove('hidden');
+                loadTeacherAnalytics();
+            }
+        }
+
+        tabStudent.addEventListener('click', showStudentView);
+        tabTeacher.addEventListener('click', showTeacherView);
+
+        // ================= STUDENT MODE LOGIC =================
+        
+        // 1. Login
+        document.getElementById('btn-start-test').addEventListener('click', () => {
+            const nameInput = document.getElementById('student-name').value.trim();
+            if (!nameInput) {
+                document.getElementById('login-error').classList.remove('hidden');
+                return;
+            }
+            studentName = nameInput;
+            document.getElementById('display-student-name').textContent = studentName;
+            
+            document.getElementById('student-login').classList.add('hidden');
+            document.getElementById('student-test-area').classList.remove('hidden');
+            
+            renderQuestions();
+        });
+
+        // 2. Render Questions
+        function renderQuestions() {
+            const container = document.getElementById('questions-container');
+            container.innerHTML = '';
+
+            questionsData.forEach((q, qIndex) => {
+                const qCard = document.createElement('div');
+                qCard.className = 'bg-white p-6 rounded-xl shadow-sm border border-slate-200';
+                
+                const qHeader = document.createElement('div');
+                qHeader.className = 'mb-4';
+                qHeader.innerHTML = `
+                    <span class="text-xs font-bold text-blue-600 tracking-wider uppercase mb-1 block">${q.category}</span>
+                    <h3 class="font-bold text-slate-800 text-lg">Question ${q.id}: ${q.text}</h3>
+                `;
+                qCard.appendChild(qHeader);
+
+                const optionsDiv = document.createElement('div');
+                optionsDiv.className = 'space-y-3';
+                
+                q.options.forEach((optText, optIndex) => {
+                    const label = document.createElement('label');
+                    label.className = `option-label flex items-start p-4 border border-slate-200 rounded-lg w-full relative overflow-hidden`;
+                    label.id = `q${qIndex}-opt${optIndex}`;
+                    
+                    const radio = document.createElement('input');
+                    radio.type = 'radio';
+                    radio.name = `question-${qIndex}`;
+                    radio.value = optIndex;
+                    radio.className = 'mt-1 w-4 h-4 text-blue-600 focus:ring-blue-500 cursor-pointer disabled:cursor-not-allowed';
+                    
+                    radio.addEventListener('change', () => {
+                        if (testSubmitted) return;
+                        studentAnswers[qIndex] = optIndex;
+                        
+                        // Clear visual selection
+                        optionsDiv.querySelectorAll('.option-label').forEach(l => l.classList.remove('selected'));
+                        label.classList.add('selected');
+                        
+                        // Update Progress
+                        const answered = studentAnswers.filter(a => a !== null).length;
+                        document.getElementById('progress-text').textContent = `${answered} / ${questionsData.length}`;
+                    });
+
+                    const span = document.createElement('span');
+                    span.className = 'ml-3 text-slate-700 leading-relaxed';
+                    span.textContent = optText;
+
+                    label.appendChild(radio);
+                    label.appendChild(span);
+                    optionsDiv.appendChild(label);
+                });
+                
+                qCard.appendChild(optionsDiv);
+
+                // Explanation block (hidden initially)
+                const expBlock = document.createElement('div');
+                expBlock.id = `explanation-${qIndex}`;
+                expBlock.className = 'hidden mt-5 p-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 border-l-4 border-l-blue-500';
+                expBlock.innerHTML = `<strong class="text-slate-900 block mb-1 font-semibold">解析 (Explanation):</strong> ${q.explanation}`;
+                qCard.appendChild(expBlock);
+
+                container.appendChild(qCard);
+            });
+        }
+
+        // 3. Submit Test
+        document.getElementById('btn-submit-test').addEventListener('click', async () => {
+            if (testSubmitted) return;
+            
+            const answeredCount = studentAnswers.filter(a => a !== null).length;
+            if (answeredCount < questionsData.length) {
+                showModal("提示 (Notice)", `您还有 ${questionsData.length - answeredCount} 道题未作答，请完成后再提交。 (Please answer all questions before submitting.)`);
+                return;
+            }
+
+            // Calculate Score
+            let score = 0;
+            questionsData.forEach((q, i) => {
+                if (studentAnswers[i] === q.answer) score++;
+            });
+
+            // UI Updates - Disable inputs, show correct/incorrect
+            testSubmitted = true;
+            document.getElementById('btn-submit-test').classList.add('hidden');
+            
+            questionsData.forEach((q, qIndex) => {
+                const qCard = document.getElementById('questions-container').children[qIndex];
+                const userAns = studentAnswers[qIndex];
+                
+                // Disable all radios
+                qCard.querySelectorAll('input[type="radio"]').forEach(r => r.disabled = true);
+                qCard.querySelectorAll('.option-label').forEach(l => l.classList.add('disabled'));
+
+                // Highlight Correct
+                qCard.querySelector(`#q${qIndex}-opt${q.answer}`).classList.add('correct');
+                
+                // Highlight Incorrect if applicable
+                if (userAns !== q.answer) {
+                    qCard.querySelector(`#q${qIndex}-opt${userAns}`).classList.add('incorrect');
+                }
+
+                // Show Explanation
+                document.getElementById(`explanation-${qIndex}`).classList.remove('hidden');
+            });
+
+            document.getElementById('student-results-summary').classList.remove('hidden');
+            document.getElementById('final-score').textContent = score;
+
+            // Save to Firebase
+            if (db && currentUser) {
+                try {
+                    const submissionsRef = collection(db, 'artifacts', appId, 'public', 'data', 'submissions');
+                    await addDoc(submissionsRef, {
+                        studentName: studentName,
+                        score: score,
+                        maxScore: questionsData.length,
+                        answers: studentAnswers,
+                        timestamp: new Date().toISOString()
+                    });
+                } catch (err) {
+                    console.error("Error saving submission:", err);
+                    showModal("同步失败", "您的成绩已在本地计算，但保存至云端失败。");
+                }
+            }
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+
+        // ================= TEACHER PORTAL LOGIC =================
+        
+        // Email + OTP Mock Login Trigger
+        document.getElementById('btn-send-code').addEventListener('click', () => {
+            const emailInput = document.getElementById('teacher-email').value.trim();
+            
+            if (emailInput !== 'xgzhcn@gmail.com') {
+                showModal("错误 (Error)", "未授权的邮箱地址！\n(Unauthorized email address!)");
+                return;
+            }
+            
+            showModal("提示", "验证码已发送！\n（系统演示环境，您的验证码为：888888）");
+            
+            // Hide email step, show code step
+            document.getElementById('email-step').classList.add('hidden');
+            document.getElementById('code-step').classList.remove('hidden');
+        });
+
+        document.getElementById('btn-verify-login').addEventListener('click', () => {
+            const codeInput = document.getElementById('teacher-code').value.trim();
+            
+            if (codeInput !== '888888') {
+                showModal("错误 (Error)", "验证码不正确！\n(Incorrect code!)");
+                return;
+            }
+            
+            // Successful Mock Login
+            isTeacherAuthenticated = true;
+            document.getElementById('teacher-login-section').classList.add('hidden');
+            document.getElementById('teacher-dashboard').classList.remove('hidden');
+            loadTeacherAnalytics();
+        });
+
+        function loadTeacherAnalytics() {
+            if (!db || !currentUser) {
+                document.getElementById('analytics-empty').textContent = "数据库未连接，无法加载数据。";
+                return;
+            }
+
+            const submissionsRef = collection(db, 'artifacts', appId, 'public', 'data', 'submissions');
+            
+            unsubscribe = onSnapshot(submissionsRef, (snapshot) => {
+                const submissions = [];
+                snapshot.forEach(doc => {
+                    submissions.push({ id: doc.id, ...doc.data() });
+                });
+                
+                processTeacherData(submissions);
+                
+            }, (error) => {
+                console.error("Error fetching submissions:", error);
+                document.getElementById('analytics-empty').textContent = "数据加载失败，请检查权限设置。";
+            });
+        }
+
+        function processTeacherData(submissions) {
+            const tableBody = document.getElementById('submissions-table-body');
+            const barsContainer = document.getElementById('analytics-bars');
+            const emptyState = document.getElementById('analytics-empty');
+            
+            tableBody.innerHTML = '';
+            
+            if (submissions.length === 0) {
+                document.getElementById('stat-total-students').textContent = '0';
+                document.getElementById('stat-avg-score').textContent = '0.0';
+                document.getElementById('stat-weak-category').textContent = '暂无数据';
+                barsContainer.innerHTML = '';
+                barsContainer.appendChild(emptyState);
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            
+            emptyState.classList.add('hidden');
+            barsContainer.innerHTML = '';
+
+            // 1. Populate Table (Sort by newest first)
+            submissions.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            let totalScore = 0;
+
+            const categoryErrors = {}; // To track errors by category
+            const questionErrors = new Array(questionsData.length).fill(0);
+
+            submissions.forEach(sub => {
+                totalScore += sub.score;
+                
+                // Add table row
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition-colors";
+                
+                const d = new Date(sub.timestamp);
+                const timeStr = `${d.getMonth()+1}/${d.getDate()} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
+                
+                        tr.innerHTML = `
+                    <td class="py-3 px-6 text-slate-800 font-medium">${sub.studentName}</td>
+                    <td class="py-3 px-6 text-slate-600"><span class="font-bold ${sub.score >= 32 ? 'text-green-600' : 'text-blue-600'}">${sub.score}</span> / 40</td>
+                    <td class="py-3 px-6 text-slate-500 text-xs">${timeStr}</td>
+                `;
+                tableBody.appendChild(tr);
+
+                // Aggregate Mistakes
+                if (sub.answers && Array.isArray(sub.answers)) {
+                    sub.answers.forEach((ans, i) => {
+                        if (ans !== questionsData[i].answer) {
+                            questionErrors[i]++;
+                            const cat = questionsData[i].category;
+                            categoryErrors[cat] = (categoryErrors[cat] || 0) + 1;
+                        }
+                    });
+                }
+            });
+
+            // 2. Update Top Stats
+            document.getElementById('stat-total-students').textContent = submissions.length;
+            const avg = (totalScore / submissions.length).toFixed(1);
+            document.getElementById('stat-avg-score').textContent = avg;
+
+            // Find weakest category
+            let maxErrCat = '无';
+            let maxErrVal = -1;
+            for (const [cat, count] of Object.entries(categoryErrors)) {
+                if (count > maxErrVal) {
+                    maxErrVal = count;
+                    maxErrCat = cat;
+                }
+            }
+            document.getElementById('stat-weak-category').textContent = maxErrVal > 0 ? maxErrCat.split(' ')[0] : '表现良好';
+
+            // 3. Render Error Bars
+            questionsData.forEach((q, i) => {
+                const errorCount = questionErrors[i];
+                const errorRate = Math.round((errorCount / submissions.length) * 100);
+                
+                const barItem = document.createElement('div');
+                barItem.innerHTML = `
+                    <div class="flex justify-between items-end mb-1 text-sm">
+                        <span class="font-medium text-slate-700 truncate w-3/4" title="Q${q.id}: ${q.text}">Q${q.id}: ${q.category}</span>
+                        <span class="text-slate-500 font-bold">${errorRate}% 错误率</span>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-2.5">
+                        <div class="bg-red-400 h-2.5 rounded-full transition-all duration-500" style="width: ${errorRate}%"></div>
+                    </div>
+                `;
+                barsContainer.appendChild(barItem);
+            });
+        }
+
+
+        // ================= UTILITIES =================
+        function showModal(title, message) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-message').textContent = message;
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.remove('opacity-0'), 10);
+        }
+
+        document.getElementById('close-modal-btn').addEventListener('click', () => {
+            modal.classList.add('opacity-0');
+            setTimeout(() => modal.classList.add('hidden'), 200);
+        });
+
+        // Start
+        window.addEventListener('DOMContentLoaded', initApp);
+
+    </script>
+</body>
+</html>
