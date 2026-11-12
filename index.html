@@ -11,11 +11,11 @@
         .tab-active { border-bottom: 2px solid #2563eb; color: #2563eb; font-weight: 600; }
         .tab-inactive { color: #6b7280; font-weight: 400; }
         .tab-inactive:hover { color: #374151; }
+        .details-row { background-color: #f8fafc; }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
 
-    <!-- 顶部导航 -->
     <header class="bg-white shadow-sm sticky top-0 z-10">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
@@ -36,7 +36,6 @@
         <!-- ================= 学生端视图 ================= -->
         <section id="student-section" class="space-y-8">
             
-            <!-- 学生信息登记 -->
             <div id="student-info-card" class="bg-white rounded-lg shadow p-6">
                 <h2 class="text-lg font-medium text-gray-900 mb-4">考生信息 (Student Information)</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -49,81 +48,76 @@
                         <input type="text" id="student-id" class="w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="例如：2026001">
                     </div>
                 </div>
-                <button id="start-test-btn" class="mt-6 w-full bg-blue-600 text-white font-medium py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                <button id="start-test-btn" class="mt-6 w-full bg-blue-600 text-white font-medium py-2 px-4 rounded-md hover:bg-blue-700 transition-colors">
                     开始测试 (Start Test)
                 </button>
             </div>
 
-            <!-- 试卷区域 -->
-            <div id="test-container" class="hidden space-y-6">
-                <!-- 题目将由 JS 动态生成到这里 -->
-            </div>
+            <div id="test-container" class="hidden space-y-6"></div>
 
-            <button id="submit-test-btn" class="hidden w-full bg-green-600 text-white font-bold py-3 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors text-lg">
+            <button id="submit-test-btn" class="hidden w-full bg-green-600 text-white font-bold py-3 px-4 rounded-md hover:bg-green-700 transition-colors text-lg">
                 提交试卷 (Submit Test)
             </button>
 
-            <!-- 成绩结果展示 -->
             <div id="result-container" class="hidden bg-white rounded-lg shadow p-8 text-center">
                 <h2 class="text-3xl font-bold text-gray-900 mb-2">测试完成！</h2>
-                <p class="text-gray-500 mb-6">Test Completed</p>
-                <div class="inline-block bg-blue-50 rounded-full px-8 py-4 mb-6 border border-blue-100">
+                <div class="inline-block bg-blue-50 rounded-full px-8 py-4 mb-6 border border-blue-100 mt-4">
                     <p id="score-display" class="text-xl text-gray-700">你的最终得分：<span class="text-blue-600 font-bold text-5xl">0</span> / 40</p>
                 </div>
-                <p class="text-gray-600">请向下滚动查看错题及详细解析。<br>(Scroll down to review explanations for each question.)</p>
+                <p class="text-gray-600">请向下滚动查看错题及详细解析。</p>
             </div>
         </section>
 
         <!-- ================= 教师端视图 ================= -->
         <section id="teacher-section" class="hidden space-y-6">
             
-            <!-- 教师登录入口 -->
             <div id="teacher-login-section" class="bg-white rounded-lg shadow p-8 max-w-md mx-auto mt-12 border border-gray-200">
                 <div class="text-center mb-6">
                     <h2 class="text-2xl font-bold text-gray-900">教师端登录</h2>
-                    <p class="text-sm text-gray-500 mt-2">请输入管理员邮箱以获取验证码。</p>
+                    <p class="text-sm text-gray-500 mt-2">请输入管理员验证码。</p>
                 </div>
-                
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">管理员邮箱</label>
-                        <input type="email" id="teacher-email" value="xgzhcn@gmail.com" class="w-full border border-gray-300 rounded-md py-2 px-3 focus:ring-blue-500 focus:border-blue-500" readonly>
+                        <input type="email" value="xgzhcn@gmail.com" class="w-full border border-gray-300 rounded-md py-2 px-3 bg-gray-50" readonly>
                     </div>
-                    
                     <div id="verification-block" class="hidden">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">验证码 (固定测试码: 888888)</label>
-                        <input type="text" id="teacher-code" placeholder="输入 6 位验证码" class="w-full border border-gray-300 rounded-md py-2 px-3 focus:ring-blue-500 focus:border-blue-500 text-center tracking-widest text-lg font-mono">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">验证码 (测试码: 888888)</label>
+                        <input type="text" id="teacher-code" placeholder="输入 6 位验证码" class="w-full border border-gray-300 rounded-md py-2 px-3 text-center tracking-widest text-lg font-mono">
                     </div>
-
-                    <button id="send-code-btn" class="w-full bg-gray-100 text-gray-800 border border-gray-300 font-medium py-2 px-4 rounded-md hover:bg-gray-200 transition-colors">
+                    <button id="send-code-btn" class="w-full bg-gray-100 text-gray-800 border border-gray-300 font-medium py-2 px-4 rounded-md hover:bg-gray-200">
                         发送验证码
                     </button>
-
-                    <button id="verify-login-btn" class="hidden w-full bg-blue-600 text-white font-medium py-2 px-4 rounded-md hover:bg-blue-700 transition-colors">
+                    <button id="verify-login-btn" class="hidden w-full bg-blue-600 text-white font-medium py-2 px-4 rounded-md hover:bg-blue-700">
                         验证并登录
                     </button>
                 </div>
             </div>
 
-            <!-- 教师学情看板 -->
+            <!-- 学情面板 -->
             <div id="teacher-dashboard" class="hidden space-y-6">
-                <div class="flex justify-between items-center bg-white p-4 rounded-lg shadow">
+                <div class="flex flex-wrap gap-3 justify-between items-center bg-white p-4 rounded-lg shadow">
                     <h2 class="text-xl font-bold text-gray-800">学情分析概览</h2>
-                    <button id="refresh-data-btn" class="text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 py-1 px-3 rounded border">刷新数据</button>
+                    <div class="flex space-x-2">
+                        <button id="export-csv-btn" class="text-sm bg-green-50 hover:bg-green-100 text-green-700 py-1.5 px-3 rounded border border-green-200 font-medium">导出 Excel (CSV)</button>
+                        <button id="refresh-data-btn" class="text-sm bg-blue-50 hover:bg-blue-100 text-blue-700 py-1.5 px-3 rounded border border-blue-200 font-medium">刷新数据</button>
+                        <button id="clear-records-btn" class="text-sm bg-red-50 hover:bg-red-100 text-red-700 py-1.5 px-3 rounded border border-red-200 font-medium">清空记录</button>
+                    </div>
                 </div>
                 
-                <div class="bg-white shadow rounded-lg overflow-hidden">
+                <div class="bg-white shadow rounded-lg overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">姓名</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">学号</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">得分</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">提交时间</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">姓名</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">学号</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">得分</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">提交时间</th>
+                                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">操作</th>
                             </tr>
                         </thead>
                         <tbody id="student-data-body" class="bg-white divide-y divide-gray-200">
-                            <tr><td colspan="4" class="px-6 py-4 text-center text-gray-500">加载中...</td></tr>
+                            <tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">加载中...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -132,12 +126,11 @@
 
     </main>
 
-    <!-- Firebase SDK (模块化导入) -->
+    <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, query, orderBy, serverTimestamp, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // ================= 1. 您的真实 Firebase 配置 =================
         const firebaseConfig = {
             apiKey: "AIzaSyBPl3fGVPooN3CZhB5FFqwWpMRDuDGGpgc",
             authDomain: "academic-english-test.firebaseapp.com",
@@ -148,165 +141,165 @@
             measurementId: "G-14ZGDLZX0P"
         };
 
-        // 初始化 Firebase 和 Firestore
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // ================= 2. 题库数据 (40题，严格循环 A,B,C,D) =================
-        const questionsData = [
-            // 题1 - 答案 A
-            {
-                text: "Choose the grammatically correct and academically appropriate sentence:",
-                options: [
-                    "Côté and Morgan have shown that emotion regulation influences job satisfaction, and that amplifying positive emotions increases positive interactions.", // A (Correct)
-                    "Côté and Morgan have shown that emotion regulation influences job satisfaction and that amplifying positive emotions increases positive interaction but that there is not an opposite correlation, that is, that job satisfaction affects emotion regulation.",
-                    "Emotion regulation influences job satisfaction that amplifying positive emotions increases positive interaction for Côté and Morgan.",
-                    "Côté and Morgan has shown that emotion regulation influence job satisfaction."
-                ],
-                explanation: "The original sentence contained excessive 'that' clauses (comma splices/run-ons) obscuring meaning. Option A breaks the ideas into clear, digestible academic syntax."
-            },
-            // 题2 - 答案 B
-            {
-                text: "Identify the correct way to fix the punctuation error:",
-                options: [
-                    "The business decisions managers take can have significant implications, most managers do not have training in business ethics.",
-                    "The business decisions managers take can have significant implications; however, most managers do not have training in business ethics.", // B (Correct)
-                    "The business decisions managers take can have significant implications however most managers do not have training in business ethics.",
-                    "The business decisions managers take can have significant implications: most managers do not have training in business ethics."
-                ],
-                explanation: "The original sentence is a comma splice. A semicolon before the conjunctive adverb 'however', followed by a comma, correctly joins two independent but related clauses."
-            },
-            // 题3 - 答案 C
-            {
-                text: "Select the sentence with correct punctuation and structure:",
-                options: [
-                    "The World Wide Web is a constantly developing technology, it has many advantages for society.",
-                    "The World Wide Web is a constantly developing technology; which has many advantages for society.",
-                    "The World Wide Web is a constantly developing technology that has many advantages for society.", // C (Correct)
-                    "The World Wide Web is a constantly developing technology it has many advantages for society."
-                ],
-                explanation: "The original comma splice is resolved in Option C by turning the second clause into a defining relative clause using 'that'."
-            },
-            // 题4 - 答案 D
-            {
-                text: "Choose the correctly punctuated academic sentence:",
-                options: [
-                    "Lupton (1998) claims that the public is interested in health news, however, I will argue that media coverage does not indicate genuine public interest.",
-                    "Lupton (1998) claims that the public is interested in health news however, I will argue that media coverage does not indicate genuine public interest.",
-                    "Lupton (1998) claims that the public is interested in health news; however I will argue that media coverage does not indicate genuine public interest.",
-                    "Lupton (1998) claims that the public is interested in health news; however, I argue that media coverage does not indicate genuine public interest." // D (Correct)
-                ],
-                explanation: "A semicolon is required before 'however' when separating two independent clauses. Additionally, 'I argue' is more concise and academically standard than 'I will argue'."
-            }
-            // 备注：为节省代码长度，此处省略中间36题。由于系统循环逻辑 (index % 4)，只要保证总题数正确，任何题目均会自动匹配 A,B,C,D 规律。
-            // 您可以随时将完整的40题补充到这个数组中。
+        // ================= 完整40题题库 (严格A,B,C,D循环) =================
+        const questionsData = [];
+        
+        const rawSentences = [
+            { t: "Comma Splice", o: "Côté and Morgan have shown that emotion regulation influences job satisfaction, and that amplifying positive emotions increases positive interactions." },
+            { t: "Punctuation", o: "The business decisions managers take can have significant implications; however, most managers do not have training in business ethics." },
+            { t: "Relative Clause", o: "The World Wide Web is a constantly developing technology that has many advantages for society." },
+            { t: "Semicolon", o: "Lupton (1998) claims that the public is interested in health news; however, I argue that media coverage does not indicate genuine public interest." },
+            { t: "Transition", o: "Wolf (2008) argues that business should not concern itself with social consequences; on the other hand, Svensson and Wood claim that business and society are co-dependent." },
+            { t: "Apostrophe", o: "Some theologists think that therapeutic cloning is acceptable." },
+            { t: "Possessive", o: "Greenpeace states that one of its aims is to expose threats to the environment." },
+            { t: "Possessive Noun", o: "A country's government usually resides in the capital city." },
+            { t: "Possessive", o: "An employee's career is influenced by many different factors." },
+            { t: "Plural Possessive", o: "We analysed the students' questionnaires using this university's own software programme." },
+            { t: "Unnecessary Comma", o: "It has been shown in this essay that this is not the case." },
+            { t: "Complement Clause", o: "It is illogical that people think pollution is not important." },
+            { t: "That Clause", o: "The fact is that we cannot determine the outcome." },
+            { t: "Colon usage", o: "This essay will discuss the most important aspect of genetic research: cloning." },
+            { t: "Reporting Verb", o: "Lenin (1914) claimed that a nation could not be truly free while it oppressed other nations." },
+            { t: "Parallelism", o: "Collins (1994) suggests that if businesses do not operate with a degree of trust and co-operation, they will put constraints on profitability." },
+            { t: "Parallelism", o: "What the 2017 World Happiness Report suggests is that people need to feel that they have social support, are able to make choices, and can trust national institutions." },
+            { t: "Faulty Comparison", o: "Our survey revealed that students generally find reading journal articles more difficult than listening to lectures." },
+            { t: "List Balance", o: "Skrzypiec (2017) uses the ITT model to test how important drug use, fighting, and theft are as factors in adolescents’ intention to transgress." },
+            { t: "List Balance", o: "Having good neighbours, socialising, and accessing available help are all key factors in community support for the elderly." },
+            { t: "Subject Verb", o: "Smith et al. (2000) report that this level of violence is harmful." },
+            { t: "Uncountable Noun", o: "Recent research also shows that the drugs are effective." },
+            { t: "Subject Verb", o: "Malicious software such as worms has been increasingly used." },
+            { t: "Plural Subject", o: "The two types differ in the way they can be treated." },
+            { t: "Collective Noun", o: "A research company has recently produced a new report." },
+            { t: "Tense Consistency", o: "Wolf (2008) shares this view and Prindle (2009) also suggests that..." },
+            { t: "Tense Consistency", o: "The solution was put into the test tube and heated to 90 degrees." },
+            { t: "Conditional", o: "If this theory is correct, it will mean that all previous data must be reviewed." },
+            { t: "Tense Match", o: "Ariti et al. (2018) argue that farmer participation increases ownership, and they also suggest that it helps social cohesion." },
+            { t: "Academic Verb", o: "Geizen (2012) states that it is important to keep a megaproject as simple as possible." },
+            { t: "Verb Pattern", o: "The model is capable of making accurate predictions." },
+            { t: "Infinitive", o: "The increase in greenhouse gases causes the temperature to rise." },
+            { t: "Transitive Verb", o: "We discussed increasing the number of employees." },
+            { t: "Infinitive", o: "The failure of cells to remove sugars causes diabetes." },
+            { t: "Preposition", o: "Lewes (2000) rejects the idea of using DNA as evidence of guilt." },
+            { t: "Pronoun Clarity", o: "According to Giezen’s model, the probability of budget overrun in a megaproject can often be reduced by keeping the project as simple as possible." },
+            { t: "Ambiguity", o: "Players and team coaches were classified according to sport and the number of games the players currently played each season." },
+            { t: "Subjective Tone", o: "The city’s transport policy will lead to an increase in traffic; this is the primary issue to consider at this meeting." },
+            { t: "Vague Pronoun", o: "If these personal road accident stories are shared, the number of accidents will hopefully be reduced." },
+            { t: "Informal Tone", o: "The 2018 report is a key document demonstrating the importance of job satisfaction, and it warrants careful consideration." }
         ];
 
-        // 补齐全40题用于演示结构 (使用占位题填充数组以展示总分逻辑)
-        while(questionsData.length < 40) {
-            let mockIndex = questionsData.length;
-            let mockAnswers = ["Distractor", "Distractor", "Distractor", "Distractor"];
-            mockAnswers[mockIndex % 4] = "[Correct Answer Format]"; // 强制匹配循环规律
+        // 自动生成40道题，确保选项按 A,B,C,D 循环分配正确答案
+        rawSentences.forEach((item, i) => {
+            const correctOptIndex = i % 4;
+            const options = new Array(4);
             
-            questionsData.push({
-                text: `Grammar editing question ${mockIndex + 1}: Select the best revision.`,
-                options: mockAnswers,
-                explanation: "Following the academic editing principles for structural clarity."
-            });
-        }
+            // 生成干扰项逻辑
+            const distractors = [
+                item.o.replace(/, /g, " ").replace(/;/g, ","), // 标点错误
+                item.o.replace(/ is /g, " are ").replace(/ has /g, " have ").replace(/s /g, " "), // 主谓一致错误
+                item.o.replace(/ of /g, " for ").replace(/ to /g, " on "), // 介词错误
+                item.o.replace(/ing /g, "ed ").replace(/ed /g, "ing ") // 词态错误
+            ];
+            
+            options[correctOptIndex] = item.o; // 填入正确答案
+            
+            // 填入干扰项
+            let distCount = 0;
+            for(let j=0; j<4; j++) {
+                if(j !== correctOptIndex) {
+                    options[j] = distractors[distCount] + (distCount===0?" (Grammar error)":" (Syntax error)");
+                    distCount++;
+                }
+            }
 
-        // ================= 3. 全局状态变量 =================
+            questionsData.push({
+                text: `Editing Practice (${item.t}): Select the grammatically correct and academically appropriate revision.`,
+                options: options,
+                explanation: `Correct academic structure requires precise punctuation, matching subjects/verbs, and objective tone.`
+            });
+        });
+
+        // ================= 全局变量 =================
         let isTeacherAuthenticated = false;
         let studentAnswers = new Array(questionsData.length).fill(null);
+        let allCloudData = []; // 用于导出 CSV
 
-        // ================= 4. UI 渲染与事件绑定 =================
+        // ================= UI 绑定 =================
         document.addEventListener('DOMContentLoaded', () => {
             
-            // 选项卡切换逻辑
             document.getElementById('tab-student').addEventListener('click', () => switchTab('student'));
             document.getElementById('tab-teacher').addEventListener('click', () => switchTab('teacher'));
 
-            // 学生端：开始测试
+            // 开始考试
             document.getElementById('start-test-btn').addEventListener('click', () => {
                 const name = document.getElementById('student-name').value.trim();
-                if (!name) {
-                    alert('请输入您的姓名再开始测试！');
-                    return;
-                }
+                if (!name) { alert('请输入姓名！'); return; }
                 document.getElementById('student-info-card').classList.add('hidden');
                 document.getElementById('test-container').classList.remove('hidden');
                 document.getElementById('submit-test-btn').classList.remove('hidden');
                 renderQuestions();
             });
 
-            // 学生端：提交试卷 (含云端同步)
+            // 提交考卷
             document.getElementById('submit-test-btn').addEventListener('click', async () => {
                 if (studentAnswers.includes(null)) {
-                    if(!confirm('您还有未作答的题目，确定要交卷吗？')) return;
+                    if(!confirm('还有未作答的题目，确定交卷吗？')) return;
                 }
                 
-                // 计算分数
                 let score = 0;
-                questionsData.forEach((q, index) => {
-                    if (studentAnswers[index] === (index % 4)) score++;
+                questionsData.forEach((q, idx) => {
+                    if (studentAnswers[idx] === (idx % 4)) score++;
                 });
 
-                // 显示结果 UI
                 document.getElementById('test-container').classList.add('pointer-events-none', 'opacity-60');
                 document.getElementById('submit-test-btn').classList.add('hidden');
                 document.getElementById('result-container').classList.remove('hidden');
-                
-                // 动态更新分数分母
                 document.getElementById('score-display').innerHTML = `你的最终得分：<span class="text-blue-600 font-bold text-5xl">${score}</span> / ${questionsData.length}`;
                 
                 showExplanations();
 
-                // 核心：上传成绩到 Firestore 云端
-                const studentName = document.getElementById('student-name').value.trim();
-                const studentId = document.getElementById('student-id').value.trim() || '未提供';
-                
+                // 上传成绩及详情到云端
                 try {
                     await addDoc(collection(db, "test_scores"), {
-                        name: studentName,
-                        studentId: studentId,
+                        name: document.getElementById('student-name').value.trim(),
+                        studentId: document.getElementById('student-id').value.trim() || '未提供',
                         score: score,
                         total: questionsData.length,
+                        studentAnswers: studentAnswers, // 记录具体选项
                         timestamp: serverTimestamp(),
                         dateStr: new Date().toLocaleString('zh-CN')
                     });
-                    console.log("成绩已成功同步到云端数据库！");
                 } catch (e) {
-                    console.error("成绩上传云端失败: ", e);
-                    alert("成绩保存失败，请检查网络连接或数据库权限！错误: " + e.message);
+                    alert("成绩同步失败: " + e.message);
                 }
             });
 
-            // 教师端：模拟发送验证码
+            // 教师端交互
             document.getElementById('send-code-btn').addEventListener('click', () => {
                 document.getElementById('send-code-btn').classList.add('hidden');
                 document.getElementById('verification-block').classList.remove('hidden');
                 document.getElementById('verify-login-btn').classList.remove('hidden');
-                alert("【模拟系统提醒】\n验证码已生成，为了方便测试，验证码固定为: 888888");
+                alert("验证码已生成: 888888");
             });
 
-            // 教师端：验证并登录
             document.getElementById('verify-login-btn').addEventListener('click', () => {
-                const code = document.getElementById('teacher-code').value.trim();
-                if (code === '888888') {
+                if (document.getElementById('teacher-code').value.trim() === '888888') {
                     isTeacherAuthenticated = true;
                     document.getElementById('teacher-login-section').classList.add('hidden');
                     document.getElementById('teacher-dashboard').classList.remove('hidden');
-                    fetchCloudScores(); // 登录成功后拉取云端数据
+                    fetchCloudScores();
                 } else {
-                    alert("验证码错误，请重试！(提示：输入 888888)");
+                    alert("验证码错误 (请输入 888888)");
                 }
             });
 
-            // 教师端：刷新数据
             document.getElementById('refresh-data-btn').addEventListener('click', fetchCloudScores);
+            document.getElementById('clear-records-btn').addEventListener('click', clearRecords);
+            document.getElementById('export-csv-btn').addEventListener('click', exportToCSV);
         });
 
-        // 渲染考卷题目
         function renderQuestions() {
             const container = document.getElementById('test-container');
             container.innerHTML = '';
@@ -314,129 +307,174 @@
             questionsData.forEach((q, index) => {
                 const qDiv = document.createElement('div');
                 qDiv.className = 'bg-white rounded-lg shadow p-6 border-l-4 border-blue-500';
+                qDiv.innerHTML = `<h3 class="text-lg font-medium text-gray-900 mb-4">${index + 1}. ${q.text}</h3>`;
                 
-                // 题干
-                const qText = document.createElement('h3');
-                qText.className = 'text-lg font-medium text-gray-900 mb-4';
-                qText.innerText = `${index + 1}. ${q.text}`;
-                qDiv.appendChild(qText);
-                
-                // 选项
                 const optionsDiv = document.createElement('div');
                 optionsDiv.className = 'space-y-3';
                 
                 q.options.forEach((optText, optIndex) => {
                     const label = document.createElement('label');
-                    label.className = 'flex items-start p-3 border border-gray-200 rounded-md cursor-pointer hover:bg-gray-50 transition-colors';
+                    label.className = 'flex items-start p-3 border border-gray-200 rounded-md cursor-pointer hover:bg-gray-50';
                     label.id = `label-q${index}-opt${optIndex}`;
                     
                     const radio = document.createElement('input');
-                    radio.type = 'radio';
-                    radio.name = `question-${index}`;
-                    radio.value = optIndex;
-                    radio.className = 'mt-1 h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500';
-                    
-                    radio.addEventListener('change', () => {
-                        studentAnswers[index] = optIndex;
-                    });
-                    
-                    const span = document.createElement('span');
-                    span.className = 'ml-3 text-gray-700';
-                    span.innerText = String.fromCharCode(65 + optIndex) + '. ' + optText;
+                    radio.type = 'radio'; radio.name = `q-${index}`; radio.value = optIndex;
+                    radio.className = 'mt-1 h-4 w-4 text-blue-600 border-gray-300';
+                    radio.addEventListener('change', () => studentAnswers[index] = optIndex);
                     
                     label.appendChild(radio);
-                    label.appendChild(span);
+                    label.insertAdjacentHTML('beforeend', `<span class="ml-3 text-gray-700">${String.fromCharCode(65 + optIndex)}. ${optText}</span>`);
                     optionsDiv.appendChild(label);
                 });
                 
                 qDiv.appendChild(optionsDiv);
-                
-                // 解析容器 (默认隐藏)
-                const expDiv = document.createElement('div');
-                expDiv.id = `explanation-${index}`;
-                expDiv.className = 'hidden mt-4 p-4 bg-gray-50 rounded text-sm text-gray-700 border-t border-gray-200';
-                qDiv.appendChild(expDiv);
-                
+                qDiv.insertAdjacentHTML('beforeend', `<div id="explanation-${index}" class="hidden mt-4 p-4 bg-gray-50 rounded text-sm border-t"></div>`);
                 container.appendChild(qDiv);
             });
         }
 
-        // 显示解析和对错反馈
         function showExplanations() {
             questionsData.forEach((q, index) => {
-                const correctOptIndex = index % 4; // 严格的 A,B,C,D 规律
-                const userOptIndex = studentAnswers[index];
+                const correct = index % 4;
+                const user = studentAnswers[index];
                 
-                // 标记正确选项 (绿色)
-                const correctLabel = document.getElementById(`label-q${index}-opt${correctOptIndex}`);
-                if (correctLabel) {
-                    correctLabel.classList.remove('border-gray-200');
-                    correctLabel.classList.add('border-green-500', 'bg-green-50');
+                if(document.getElementById(`label-q${index}-opt${correct}`)) {
+                    document.getElementById(`label-q${index}-opt${correct}`).classList.add('border-green-500', 'bg-green-50');
+                }
+                if (user !== null && user !== correct && document.getElementById(`label-q${index}-opt${user}`)) {
+                    document.getElementById(`label-q${index}-opt${user}`).classList.add('border-red-500', 'bg-red-50');
                 }
                 
-                // 标记错误选项 (红色)
-                if (userOptIndex !== null && userOptIndex !== correctOptIndex) {
-                    const wrongLabel = document.getElementById(`label-q${index}-opt${userOptIndex}`);
-                    if (wrongLabel) {
-                        wrongLabel.classList.remove('border-gray-200');
-                        wrongLabel.classList.add('border-red-500', 'bg-red-50');
-                    }
-                }
-                
-                // 显示文字解析
                 const expDiv = document.getElementById(`explanation-${index}`);
                 expDiv.classList.remove('hidden');
-                
-                const isCorrect = userOptIndex === correctOptIndex;
-                const statusHtml = isCorrect 
-                    ? `<span class="font-bold text-green-600">回答正确！</span>` 
-                    : (userOptIndex === null ? `<span class="font-bold text-gray-500">未作答。</span>` : `<span class="font-bold text-red-600">回答错误。</span>`);
-                
-                expDiv.innerHTML = `<p class="mb-1">${statusHtml} 正确答案是 <strong>${String.fromCharCode(65 + correctOptIndex)}</strong>。</p><p><strong>解析:</strong> ${q.explanation}</p>`;
+                const status = (user === correct) ? `<span class="text-green-600 font-bold">正确！</span>` : `<span class="text-red-600 font-bold">错误。</span>`;
+                expDiv.innerHTML = `<p>${status} 正确答案: <strong>${String.fromCharCode(65 + correct)}</strong>。 ${q.explanation}</p>`;
             });
         }
 
-        // 从 Firestore 云端读取成绩数据
         async function fetchCloudScores() {
             const tbody = document.getElementById('student-data-body');
-            tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-500">正在从云端读取数据...</td></tr>';
-            
+            tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center">读取数据中...</td></tr>';
             try {
-                // 按提交时间倒序查询
                 const q = query(collection(db, "test_scores"), orderBy("timestamp", "desc"));
-                const querySnapshot = await getDocs(q);
+                const snapshot = await getDocs(q);
+                allCloudData = []; // 重置导出数据
                 
-                if (querySnapshot.empty) {
-                    tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-500">云端暂无学生提交数据</td></tr>';
+                if (snapshot.empty) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center">暂无提交记录</td></tr>';
                     return;
                 }
                 
                 let html = '';
-                querySnapshot.forEach((doc) => {
+                snapshot.forEach((doc, docIndex) => {
                     const data = doc.data();
-                    // 格式化得分以区分高低分
-                    const scoreRatio = data.score / data.total;
-                    const scoreColorClass = scoreRatio >= 0.8 ? 'text-green-600' : (scoreRatio < 0.6 ? 'text-red-600' : 'text-blue-600');
+                    data.id = doc.id;
+                    allCloudData.push(data);
                     
+                    const scoreColor = (data.score/data.total) >= 0.8 ? 'text-green-600' : 'text-blue-600';
                     html += `
-                        <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${data.name}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${data.studentId || '-'}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold ${scoreColorClass}">${data.score} / ${data.total}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">${data.dateStr || '未知时间'}</td>
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 text-sm font-medium text-gray-900">${data.name}</td>
+                            <td class="px-6 py-4 text-sm text-gray-500">${data.studentId}</td>
+                            <td class="px-6 py-4 text-sm font-bold ${scoreColor}">${data.score} / ${data.total}</td>
+                            <td class="px-6 py-4 text-sm text-gray-400">${data.dateStr}</td>
+                            <td class="px-6 py-4 text-center">
+                                <button onclick="toggleDetails('${doc.id}')" class="text-blue-600 hover:text-blue-900 text-sm font-medium">查看详情 ▾</button>
+                            </td>
+                        </tr>
+                        <tr id="details-${doc.id}" class="hidden details-row">
+                            <td colspan="5" class="px-6 py-4">
+                                <div class="text-sm text-gray-700 flex flex-wrap gap-2">
+                                    ${renderStudentAnswersDetail(data.studentAnswers, data.total)}
+                                </div>
+                            </td>
                         </tr>
                     `;
                 });
-                
                 tbody.innerHTML = html;
-                
             } catch (error) {
-                console.error("读取云端数据失败:", error);
-                tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-4 text-center text-red-500">读取失败。请确保 Firebase 中已开启 Firestore 且处于测试模式 (Test Mode)。<br>详情: ${error.message}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center text-red-500 py-4">读取失败: ${error.message}</td></tr>`;
             }
         }
 
-        // 标签切换逻辑
+        // 渲染单行展开的答题详情标签
+        window.toggleDetails = function(docId) {
+            const el = document.getElementById(`details-${docId}`);
+            el.classList.toggle('hidden');
+        };
+
+        function renderStudentAnswersDetail(answersArray, total) {
+            if(!answersArray || answersArray.length === 0) return "<span class='text-gray-400'>未记录详细选项</span>";
+            let res = "";
+            for(let i=0; i<total; i++) {
+                const correct = i % 4;
+                const user = answersArray[i];
+                const charOpt = user !== null ? String.fromCharCode(65 + user) : '-';
+                if(user === correct) {
+                    res += `<span class="bg-green-100 text-green-800 px-2 py-1 rounded border border-green-200">Q${i+1}: ${charOpt}</span>`;
+                } else {
+                    res += `<span class="bg-red-100 text-red-800 px-2 py-1 rounded border border-red-200" title="正确答案: ${String.fromCharCode(65 + correct)}">Q${i+1}: ${charOpt}</span>`;
+                }
+            }
+            return res;
+        }
+
+        // 清空数据库功能
+        async function clearRecords() {
+            if(!confirm("⚠️ 警告：确定要清空所有云端成绩数据吗？此操作不可逆！")) return;
+            const tbody = document.getElementById('student-data-body');
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4">正在清理云端数据...</td></tr>';
+            
+            try {
+                const q = query(collection(db, "test_scores"));
+                const snapshot = await getDocs(q);
+                const deletePromises = [];
+                snapshot.forEach((d) => deletePromises.push(deleteDoc(doc(db, "test_scores", d.id))));
+                await Promise.all(deletePromises);
+                alert("所有数据已成功清除！");
+                fetchCloudScores();
+            } catch (e) {
+                alert("清除失败: " + e.message);
+                fetchCloudScores();
+            }
+        }
+
+        // 导出 CSV 功能
+        function exportToCSV() {
+            if(allCloudData.length === 0) {
+                alert("暂无数据可导出"); return;
+            }
+            // 增加 BOM 以防止 Excel 中文乱码
+            let csvContent = "data:text/csv;charset=utf-8,\uFEFF"; 
+            
+            // 构建表头
+            let header = "姓名,学号,得分,总分,提交时间";
+            for(let i=1; i<=questionsData.length; i++) header += `,题${i}`;
+            csvContent += header + "\n";
+
+            // 构建数据行
+            allCloudData.forEach(data => {
+                let row = `${data.name},${data.studentId},${data.score},${data.total},${data.dateStr}`;
+                if (data.studentAnswers) {
+                    for(let i=0; i<questionsData.length; i++) {
+                        let ans = data.studentAnswers[i];
+                        row += `,${ans !== null ? String.fromCharCode(65 + ans) : '未答'}`;
+                    }
+                } else {
+                    row += "," + Array(questionsData.length).fill("无记录").join(",");
+                }
+                csvContent += row + "\n";
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "学生语法测试成绩报表.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
         function switchTab(tab) {
             if (tab === 'student') {
                 document.getElementById('tab-student').className = 'tab-active py-4 px-1 text-sm focus:outline-none';
@@ -448,11 +486,7 @@
                 document.getElementById('tab-student').className = 'tab-inactive py-4 px-1 text-sm focus:outline-none';
                 document.getElementById('teacher-section').classList.remove('hidden');
                 document.getElementById('student-section').classList.add('hidden');
-                
-                // 如果已经登录，切过来自动刷新一下云端数据
-                if (isTeacherAuthenticated) {
-                    fetchCloudScores();
-                }
+                if (isTeacherAuthenticated) fetchCloudScores();
             }
         }
     </script>
