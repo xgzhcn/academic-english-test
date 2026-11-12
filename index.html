@@ -71,17 +71,17 @@
         <!-- ================= 教师端视图 ================= -->
         <section id="teacher-section" class="hidden space-y-6">
             
-           <div id="teacher-login-section" class="bg-white rounded-lg shadow p-8 max-w-md mx-auto mt-12 border border-gray-200">
+            <div id="teacher-login-section" class="bg-white rounded-lg shadow p-8 max-w-md mx-auto mt-12 border border-gray-200">
                 <div class="text-center mb-6">
                     <h2 class="text-2xl font-bold text-gray-900">教师端登录</h2>
-                    <p class="text-sm text-gray-500 mt-2">请输入您的专属安全码以查看学情数据。</p>
+                    <p class="text-sm text-gray-500 mt-2">请输入管理员邮箱及专属安全码以查看学情数据。</p>
                 </div>
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">管理员邮箱</label>
-                        <input type="email" value="xgzhcn@gmail.com" class="w-full border border-gray-300 rounded-md py-2 px-3 bg-gray-50 text-gray-500" readonly>
+                        <input type="email" id="teacher-email" placeholder="输入管理员邮箱" class="w-full border border-gray-300 rounded-md py-2 px-3 focus:ring-blue-500 focus:border-blue-500">
                     </div>
-                    <div id="verification-block">
+                    <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">专属安全码 (Security Code)</label>
                         <input type="password" id="teacher-code" placeholder="输入 6 位安全码" class="w-full border border-gray-300 rounded-md py-2 px-3 text-center tracking-widest text-lg font-mono focus:ring-blue-500 focus:border-blue-500">
                     </div>
@@ -187,22 +187,20 @@
             { t: "Informal Tone", o: "The 2018 report is a key document demonstrating the importance of job satisfaction, and it warrants careful consideration." }
         ];
 
-        // 自动生成40道题，确保选项按 A,B,C,D 循环分配正确答案
+        // 自动生成40道题
         rawSentences.forEach((item, i) => {
             const correctOptIndex = i % 4;
             const options = new Array(4);
             
-            // 生成干扰项逻辑
             const distractors = [
-                item.o.replace(/, /g, " ").replace(/;/g, ","), // 标点错误
-                item.o.replace(/ is /g, " are ").replace(/ has /g, " have ").replace(/s /g, " "), // 主谓一致错误
-                item.o.replace(/ of /g, " for ").replace(/ to /g, " on "), // 介词错误
-                item.o.replace(/ing /g, "ed ").replace(/ed /g, "ing ") // 词态错误
+                item.o.replace(/, /g, " ").replace(/;/g, ","),
+                item.o.replace(/ is /g, " are ").replace(/ has /g, " have ").replace(/s /g, " "),
+                item.o.replace(/ of /g, " for ").replace(/ to /g, " on "),
+                item.o.replace(/ing /g, "ed ").replace(/ed /g, "ing ")
             ];
             
-            options[correctOptIndex] = item.o; // 填入正确答案
+            options[correctOptIndex] = item.o;
             
-            // 填入干扰项
             let distCount = 0;
             for(let j=0; j<4; j++) {
                 if(j !== correctOptIndex) {
@@ -221,7 +219,7 @@
         // ================= 全局变量 =================
         let isTeacherAuthenticated = false;
         let studentAnswers = new Array(questionsData.length).fill(null);
-        let allCloudData = []; // 用于导出 CSV
+        let allCloudData = [];
 
         // ================= UI 绑定 =================
         document.addEventListener('DOMContentLoaded', () => {
@@ -257,14 +255,13 @@
                 
                 showExplanations();
 
-                // 上传成绩及详情到云端
                 try {
                     await addDoc(collection(db, "test_scores"), {
                         name: document.getElementById('student-name').value.trim(),
                         studentId: document.getElementById('student-id').value.trim() || '未提供',
                         score: score,
                         total: questionsData.length,
-                        studentAnswers: studentAnswers, // 记录具体选项
+                        studentAnswers: studentAnswers,
                         timestamp: serverTimestamp(),
                         dateStr: new Date().toLocaleString('zh-CN')
                     });
@@ -273,21 +270,20 @@
                 }
             });
 
-            // 教师端交互
-           // ================= 教师端交互 =================
-            // (删除了原来的 send-code-btn 事件)
-
+            // 教师端登录逻辑：同时验证邮箱和安全码
             document.getElementById('verify-login-btn').addEventListener('click', () => {
-                // 将安全码设置为我们约定的永久验证码 978476
-                if (document.getElementById('teacher-code').value.trim() === '978476') {
+                const inputEmail = document.getElementById('teacher-email').value.trim();
+                const inputCode = document.getElementById('teacher-code').value.trim();
+                
+                if (inputEmail === 'xgzhcn@gmail.com' && inputCode === '629471') {
                     isTeacherAuthenticated = true;
-                    // 清空输入框，保护隐私
+                    // 清空密码框保护隐私
                     document.getElementById('teacher-code').value = '';
                     document.getElementById('teacher-login-section').classList.add('hidden');
                     document.getElementById('teacher-dashboard').classList.remove('hidden');
                     fetchCloudScores();
                 } else {
-                    alert("安全码错误，请确认您输入了正确的永久验证码！");
+                    alert("登录失败！请输入正确的管理员邮箱和专属安全码。");
                 }
             });
 
@@ -354,7 +350,7 @@
             try {
                 const q = query(collection(db, "test_scores"), orderBy("timestamp", "desc"));
                 const snapshot = await getDocs(q);
-                allCloudData = []; // 重置导出数据
+                allCloudData = [];
                 
                 if (snapshot.empty) {
                     tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center">暂无提交记录</td></tr>';
@@ -393,7 +389,6 @@
             }
         }
 
-        // 渲染单行展开的答题详情标签
         window.toggleDetails = function(docId) {
             const el = document.getElementById(`details-${docId}`);
             el.classList.toggle('hidden');
@@ -415,7 +410,6 @@
             return res;
         }
 
-        // 清空数据库功能
         async function clearRecords() {
             if(!confirm("⚠️ 警告：确定要清空所有云端成绩数据吗？此操作不可逆！")) return;
             const tbody = document.getElementById('student-data-body');
@@ -435,20 +429,16 @@
             }
         }
 
-        // 导出 CSV 功能
         function exportToCSV() {
             if(allCloudData.length === 0) {
                 alert("暂无数据可导出"); return;
             }
-            // 增加 BOM 以防止 Excel 中文乱码
             let csvContent = "data:text/csv;charset=utf-8,\uFEFF"; 
             
-            // 构建表头
             let header = "姓名,学号,得分,总分,提交时间";
             for(let i=1; i<=questionsData.length; i++) header += `,题${i}`;
             csvContent += header + "\n";
 
-            // 构建数据行
             allCloudData.forEach(data => {
                 let row = `${data.name},${data.studentId},${data.score},${data.total},${data.dateStr}`;
                 if (data.studentAnswers) {
