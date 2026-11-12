@@ -274,21 +274,20 @@
             });
 
             // 教师端交互
-            document.getElementById('send-code-btn').addEventListener('click', () => {
-                document.getElementById('send-code-btn').classList.add('hidden');
-                document.getElementById('verification-block').classList.remove('hidden');
-                document.getElementById('verify-login-btn').classList.remove('hidden');
-                alert("验证码已生成: 888888");
-            });
+           // ================= 教师端交互 =================
+            // (删除了原来的 send-code-btn 事件)
 
             document.getElementById('verify-login-btn').addEventListener('click', () => {
-                if (document.getElementById('teacher-code').value.trim() === '888888') {
+                // 将安全码设置为我们约定的永久验证码 978476
+                if (document.getElementById('teacher-code').value.trim() === '978476') {
                     isTeacherAuthenticated = true;
+                    // 清空输入框，保护隐私
+                    document.getElementById('teacher-code').value = '';
                     document.getElementById('teacher-login-section').classList.add('hidden');
                     document.getElementById('teacher-dashboard').classList.remove('hidden');
                     fetchCloudScores();
                 } else {
-                    alert("验证码错误 (请输入 888888)");
+                    alert("安全码错误，请确认您输入了正确的永久验证码！");
                 }
             });
 
